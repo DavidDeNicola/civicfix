@@ -5,11 +5,12 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ReportService } from '../../../core/services/report.service';
 import { Report } from '../../../core/models/report.model';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-reports-list',
   standalone: true,
-  imports: [CommonModule, MatCardModule, MatChipsModule, MatProgressSpinnerModule],
+  imports: [CommonModule, RouterLink, MatCardModule, MatChipsModule, MatProgressSpinnerModule],
   templateUrl: './reports-list.component.html',
   styleUrl: './reports-list.component.scss'
 })

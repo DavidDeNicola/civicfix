@@ -9,7 +9,7 @@
 } @else {
   <div class="reports-grid">
     @for (report of reports; track report.id) {
-      <mat-card class="report-card">
+      <mat-card class="report-card" [routerLink]="['/reports', report.id]">
         <mat-card-header>
           <mat-card-title>{{ report.title }}</mat-card-title>
           <mat-card-subtitle>{{ report.address }}</mat-card-subtitle>

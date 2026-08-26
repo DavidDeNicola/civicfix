@@ -1,0 +1,77 @@
+@if (loading) {
+  <div class="spinner-container"><mat-spinner></mat-spinner></div>
+} @else if (errore && !report) {
+  <p class="error-message">{{ errore }}</p>
+} @else if (report) {
+
+  <mat-card class="detail-card">
+    <mat-card-header>
+      <mat-card-title>{{ report.title }}</mat-card-title>
+      <mat-card-subtitle>{{ report.address }}</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <p>{{ report.description }}</p>
+      <mat-chip>{{ report.category }}</mat-chip>
+      <mat-chip>{{ report.status }}</mat-chip>
+
+      @if (photos.length > 0) {
+        <div class="photo-gallery">
+          @for (photo of photos; track photo.id) {
+            <img [src]="photoBaseUrl + photo.filePath" alt="Foto segnalazione">
+          }
+        </div>
+      }
+
+      @if (puoGestireStato) {
+        <div class="status-control">
+          <mat-form-field appearance="outline">
+            <mat-label>Cambia stato</mat-label>
+            <mat-select [(ngModel)]="nuovoStato">
+              @for (stato of statiDisponibili; track stato) {
+                <mat-option [value]="stato">{{ stato }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+          <button mat-raised-button color="primary" [disabled]="salvataggioInCorso" (click)="cambiaStato()">
+            Aggiorna
+          </button>
+        </div>
+      }
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="updates-card">
+    <mat-card-title>Cronologia</mat-card-title>
+    <mat-card-content>
+      @if (updates.length === 0) {
+        <p>Nessun aggiornamento.</p>
+      } @else {
+        @for (update of updates; track update.id) {
+          <div class="update-item">
+            <strong>{{ update.authorUsername }}</strong>
+            @if (update.type === 'STATUS_CHANGE') {
+              <span> ha cambiato lo stato da {{ update.oldStatus }} a {{ update.newStatus }}</span>
+            } @else {
+              <p>{{ update.message }}</p>
+            }
+            <small>{{ update.createdAt | date:'short' }}</small>
+          </div>
+        }
+      }
+
+      @if (errore && report) {
+        <p class="error-message">{{ errore }}</p>
+      }
+
+      <div class="comment-form">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Aggiungi un commento</mat-label>
+          <input matInput [(ngModel)]="nuovoCommento" (keyup.enter)="inviaCommento()">
+        </mat-form-field>
+        <button mat-raised-button color="primary" [disabled]="salvataggioInCorso" (click)="inviaCommento()">
+          Invia
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+}

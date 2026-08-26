@@ -1,0 +1,10 @@
+.spinner-container { display: flex; justify-content: center; margin-top: 48px; }
+.detail-card, .updates-card { max-width: 700px; margin: 16px auto; }
+.photo-gallery { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+.photo-gallery img { width: 150px; height: 150px; object-fit: cover; border-radius: 4px; }
+.status-control { display: flex; gap: 12px; align-items: center; margin-top: 16px; }
+.update-item { padding: 8px 0; border-bottom: 1px solid rgba(128,128,128,0.2); }
+.update-item small { color: #888; }
+.comment-form { display: flex; gap: 12px; align-items: flex-start; margin-top: 16px; }
+.full-width { flex: 1; }
+.error-message { color: #c62828; }

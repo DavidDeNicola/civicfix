@@ -37,3 +37,24 @@ export interface PagedResponse<T> {
   totalElements: number;
   totalPages: number;
 }
+
+export interface ReportPhoto {
+  id: number;
+  filePath: string;
+  uploadedAt: string;
+}
+
+export enum UpdateType {
+  COMMENT = 'COMMENT',
+  STATUS_CHANGE = 'STATUS_CHANGE'
+}
+
+export interface Update {
+  id: number;
+  authorUsername: string;
+  type: UpdateType;
+  message: string;
+  oldStatus: ReportStatus | null;
+  newStatus: ReportStatus | null;
+  createdAt: string;
+}
