@@ -1,0 +1,30 @@
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  // niente background-color qui: lo eredita dal body
+}
+
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  padding: 16px;
+}
+
+.full-width {
+  width: 100%;
+  margin-bottom: 12px;
+}
+
+.error-message {
+  color: #c62828;
+  font-size: 0.9rem;
+  margin-bottom: 12px;
+}
+
+.register-link {
+  text-align: center;
+  margin-top: 16px;
+  font-size: 0.9rem;
+}

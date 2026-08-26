@@ -1,0 +1,17 @@
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.app-title {
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 1.2rem;
+}
+.spacer {
+  flex: 1 1 auto;
+}
+.username {
+  margin-right: 8px;
+  font-size: 0.9rem;
+}

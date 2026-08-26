@@ -1,0 +1,18 @@
+<mat-toolbar color="primary" class="navbar">
+  <span class="app-title" routerLink="/reports">CivicFix</span>
+
+  <span class="spacer"></span>
+
+  @if (authService.isLoggedIn()) {
+    <span class="username">{{ authService.username }} ({{ authService.role }})</span>
+    <button mat-button (click)="logout()">
+      <mat-icon>logout</mat-icon> Esci
+    </button>
+  } @else if(!isAuthPage){
+    <button mat-button routerLink="/login">Accedi</button>
+  }
+
+  <button mat-icon-button (click)="themeService.toggleTheme()">
+    <mat-icon>{{ themeService.isDarkTheme ? 'light_mode' : 'dark_mode' }}</mat-icon>
+  </button>
+</mat-toolbar>

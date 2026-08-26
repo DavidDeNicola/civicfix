@@ -1,0 +1,24 @@
+@if (loading) {
+  <div class="spinner-container">
+    <mat-spinner></mat-spinner>
+  </div>
+} @else if (errore) {
+  <p class="error-message">{{ errore }}</p>
+} @else if (reports.length === 0) {
+  <p>Nessuna segnalazione trovata.</p>
+} @else {
+  <div class="reports-grid">
+    @for (report of reports; track report.id) {
+      <mat-card class="report-card">
+        <mat-card-header>
+          <mat-card-title>{{ report.title }}</mat-card-title>
+          <mat-card-subtitle>{{ report.address }}</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <p>{{ report.description }}</p>
+          <mat-chip>{{ report.status }}</mat-chip>
+        </mat-card-content>
+      </mat-card>
+    }
+  </div>
+}

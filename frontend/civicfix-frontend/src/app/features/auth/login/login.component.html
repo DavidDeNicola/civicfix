@@ -1,0 +1,52 @@
+<div class="login-container">
+  <mat-card class="login-card">
+    <mat-card-header>
+      <mat-card-title>Accedi a CivicFix</mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+
+      @if (errore) {
+        <p class="error-message">{{ errore }}</p>
+      }
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Username</mat-label>
+        <input matInput [(ngModel)]="username" (keyup.enter)="login()" autocomplete="username">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Password</mat-label>
+        <input matInput type="password" [(ngModel)]="password" (keyup.enter)="login()" autocomplete="current-password">
+      </mat-form-field>
+
+      <button mat-flat-button color="primary" class="full-width"
+              (click)="login()" [disabled]="loading">
+        {{ loading ? 'Accesso in corso...' : 'Accedi' }}
+      </button>
+
+      <p class="register-link">
+        Non hai un account? <a routerLink="/register">Registrati</a>
+      </p>
+
+    </mat-card-content>
+  </mat-card>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
