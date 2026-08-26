@@ -1,0 +1,47 @@
+<mat-card class="create-card">
+  <mat-card-title>Nuova segnalazione</mat-card-title>
+  <mat-card-content>
+
+    @if (errore) { <p class="error-message">{{ errore }}</p> }
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Titolo</mat-label>
+      <input matInput [(ngModel)]="titolo">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Descrizione</mat-label>
+      <textarea matInput rows="4" [(ngModel)]="descrizione"></textarea>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Categoria</mat-label>
+      <mat-select [(ngModel)]="categoria">
+        @for (cat of categorieDisponibili; track cat) {
+          <mat-option [value]="cat">{{ cat }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Indirizzo (facoltativo)</mat-label>
+      <input matInput [(ngModel)]="indirizzo">
+    </mat-form-field>
+
+    <p class="map-hint">Clicca sulla mappa per indicare la posizione della segnalazione</p>
+    <div #mapContainer class="map-container"></div>
+
+    @if (latitudine !== null && longitudine !== null) {
+      <p class="coords">Posizione selezionata: {{ latitudine | number:'1.5-5' }}, {{ longitudine | number:'1.5-5' }}</p>
+    }
+
+    <div class="file-input">
+      <label for="photos">Foto (facoltative)</label>
+      <input id="photos" type="file" multiple accept="image/*" (change)="onFileSelected($event)">
+    </div>
+
+    <button mat-raised-button color="primary" [disabled]="salvataggioInCorso" (click)="invia()">
+      Invia segnalazione
+    </button>
+  </mat-card-content>
+</mat-card>

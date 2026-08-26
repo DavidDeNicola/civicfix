@@ -1,5 +1,5 @@
 @use '@angular/material' as mat;
-
+@import 'leaflet/dist/leaflet.css';
 html {
   @include mat.theme((
     color: mat.$azure-palette,

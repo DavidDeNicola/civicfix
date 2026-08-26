@@ -1,3 +1,4 @@
+import { CreateReportComponent } from './features/reports/create-report/create-report.component';
 import { Routes } from '@angular/router';
 import { LoginComponent } from './features/auth/login/login.component';
 import { RegisterComponent } from './features/auth/register/register.component';
@@ -12,6 +13,7 @@ export const routes: Routes = [
   { path: 'login', title: 'Accedi', component: LoginComponent },
   { path: 'register', title: 'Registrati', component: RegisterComponent },
   { path: 'reports', title: 'Segnalazioni', component: ReportsListComponent, canActivate: [authGuard] },
+  { path: 'reports/new', title: 'Nuova segnalazione', component: CreateReportComponent, canActivate: [authGuard] },
   { path: 'reports/:id', title: 'Dettaglio segnalazione', component: ReportDetailComponent, canActivate: [authGuard] },
   { path: 'admin', title: 'Amministrazione', component: AdminDashboardComponent, canActivate: [authGuard, adminGuard] }
 ];

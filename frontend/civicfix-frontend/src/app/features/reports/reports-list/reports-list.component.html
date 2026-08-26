@@ -8,6 +8,11 @@
   <p>Nessuna segnalazione trovata.</p>
 } @else {
   <div class="reports-grid">
+    @if (authService.role === 'CITIZEN') {
+      <button mat-raised-button color="primary" routerLink="/reports/new" class="new-report-btn">
+        Nuova segnalazione
+      </button>
+    }
     @for (report of reports; track report.id) {
       <mat-card class="report-card" [routerLink]="['/reports', report.id]">
         <mat-card-header>

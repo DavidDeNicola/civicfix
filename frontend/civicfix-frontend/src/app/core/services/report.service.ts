@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {PagedResponse, Report, ReportPhoto, ReportStatus, Update} from '../models/report.model';
+import {CreateReportRequest, PagedResponse, Report, ReportPhoto, ReportStatus, Update} from '../models/report.model';
 
 const API_URL = 'http://localhost:8080/api/reports';
 
@@ -46,5 +46,15 @@ export class ReportService {
 
   assignOperator(reportId: number, operatorId: number): Observable<Report> {
     return this.http.put<Report>(`${API_URL}/${reportId}/assign-operator`, { operatorId });
+  }
+
+  createReport(dto: CreateReportRequest): Observable<Report> {
+    return this.http.post<Report>(API_URL, dto);
+  }
+
+  uploadPhoto(reportId: number, file: File): Observable<ReportPhoto> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<ReportPhoto>(`${API_URL}/${reportId}/photos`, formData);
   }
 }

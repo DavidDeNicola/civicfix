@@ -40,7 +40,7 @@ export interface PagedResponse<T> {
 
 export interface ReportPhoto {
   id: number;
-  filePath: string;
+  url: string;
   uploadedAt: string;
 }
 
@@ -57,4 +57,13 @@ export interface Update {
   oldStatus: ReportStatus | null;
   newStatus: ReportStatus | null;
   createdAt: string;
+}
+
+export interface CreateReportRequest {
+  title: string;
+  description: string;
+  category: ReportCategory;
+  latitude: number;
+  longitude: number;
+  address: string;
 }

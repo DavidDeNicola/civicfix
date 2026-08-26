@@ -17,7 +17,7 @@
       @if (photos.length > 0) {
         <div class="photo-gallery">
           @for (photo of photos; track photo.id) {
-            <img [src]="photoBaseUrl + photo.filePath" alt="Foto segnalazione">
+            <img [src]="photoBaseUrl + photo.url" alt="Foto segnalazione">
           }
         </div>
       }
