@@ -1,15 +1,9 @@
 package org.civicfix.app.service;
 
 import lombok.RequiredArgsConstructor;
-import org.civicfix.app.dto.CreateReportRequest;
-import org.civicfix.app.dto.PagedResponse;
-import org.civicfix.app.dto.ReportResponse;
-import org.civicfix.app.dto.UpdateResponse;
+import org.civicfix.app.dto.*;
 import org.civicfix.app.model.*;
-import org.civicfix.app.repository.ReportRepository;
-import org.civicfix.app.repository.TeamRepository;
-import org.civicfix.app.repository.UpdateRepository;
-import org.civicfix.app.repository.UserRepository;
+import org.civicfix.app.repository.*;
 import org.civicfix.app.repository.specification.ReportSpecifications;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,6 +12,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -29,6 +24,8 @@ public class ReportService {
     private final UserRepository userRepository;
     private final TeamRepository teamRepository;
     private final UpdateRepository updateRepository;
+    private final FileStorageService fileStorageService;
+    private final ReportPhotoRepository reportPhotoRepository;
 
     public ReportResponse createReport(CreateReportRequest request, Long reporterId) {
         User reporter = userRepository.findById(reporterId)
@@ -154,6 +151,28 @@ public class ReportService {
     public List<UpdateResponse> getUpdates(Long reportId) {
         return updateRepository.findByReportIdOrderByCreatedAtAsc(reportId)
                 .stream().map(UpdateResponse::from).toList();
+    }
+
+    public ReportPhotoResponse uploadPhoto(Long reportId, MultipartFile file, Long currentUserId) {
+        Report report = reportRepository.findById(reportId)
+                .orElseThrow(() -> new IllegalArgumentException("Segnalazione non trovata"));
+
+        if (!report.getReporter().getId().equals(currentUserId)) {
+            throw new AccessDeniedException("Solo l'autore della segnalazione può caricare foto");
+        }
+
+        String filename = fileStorageService.store(file);
+
+        ReportPhoto photo = new ReportPhoto();
+        photo.setReport(report);
+        photo.setFilePath(filename);
+
+        return ReportPhotoResponse.from(reportPhotoRepository.save(photo));
+    }
+
+    public List<ReportPhotoResponse> getPhotos(Long reportId) {
+        return reportPhotoRepository.findByReportId(reportId)
+                .stream().map(ReportPhotoResponse::from).toList();
     }
 }
 

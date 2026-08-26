@@ -8,10 +8,12 @@ import org.civicfix.app.model.ReportStatus;
 import org.civicfix.app.security.CustomUserDetails;
 import org.civicfix.app.service.ReportService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -82,5 +84,19 @@ public class ReportController {
     @GetMapping("/{id}/updates")
     public ResponseEntity<List<UpdateResponse>> getUpdates(@PathVariable Long id) {
         return ResponseEntity.ok(reportService.getUpdates(id));
+    }
+
+    @PostMapping(value = "/{id}/photos", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ReportPhotoResponse> uploadPhoto(
+            @PathVariable Long id,
+            @RequestParam("file") MultipartFile file,
+            @AuthenticationPrincipal CustomUserDetails currentUser) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(reportService.uploadPhoto(id, file, currentUser.getId()));
+    }
+
+    @GetMapping("/{id}/photos")
+    public ResponseEntity<List<ReportPhotoResponse>> getPhotos(@PathVariable Long id) {
+        return ResponseEntity.ok(reportService.getPhotos(id));
     }
 }
