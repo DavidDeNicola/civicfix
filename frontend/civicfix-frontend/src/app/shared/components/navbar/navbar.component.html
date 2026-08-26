@@ -5,6 +5,11 @@
 
   @if (authService.isLoggedIn()) {
     <span class="username">{{ authService.username }} ({{ authService.role }})</span>
+    @if (authService.role === 'ADMIN') {
+      <button mat-button routerLink="/admin">
+        <mat-icon>admin_panel_settings</mat-icon>  Gestione
+      </button>
+    }
     <button mat-button (click)="logout()">
       <mat-icon>logout</mat-icon> Esci
     </button>

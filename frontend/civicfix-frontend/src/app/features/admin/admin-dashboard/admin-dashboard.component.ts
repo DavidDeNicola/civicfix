@@ -1,0 +1,157 @@
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatButtonModule } from '@angular/material/button';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { AdminService } from '../../../core/services/admin.service';
+import { ReportService } from '../../../core/services/report.service';
+import { AdminUser, CreateUserRequest, CreateTeamRequest, Team } from '../../../core/models/admin.model';
+import { Role } from '../../../core/models/user.model';
+import { Report, ReportCategory } from '../../../core/models/report.model';
+
+@Component({
+  selector: 'app-admin-dashboard',
+  standalone: true,
+  imports: [
+    CommonModule, FormsModule, MatTabsModule, MatFormFieldModule,
+    MatInputModule, MatSelectModule, MatButtonModule, MatProgressSpinnerModule
+  ],
+  templateUrl: './admin-dashboard.component.html',
+  styleUrl: './admin-dashboard.component.scss'
+})
+export class AdminDashboardComponent implements OnInit {
+  users: AdminUser[] = [];
+  teams: Team[] = [];
+  reports: Report[] = [];
+
+  loading: boolean = true;
+  errore: string | null = null;
+  messaggio: string | null = null;
+
+  ruoliDisponibili = Object.values(Role);
+  categorieDisponibili = Object.values(ReportCategory);
+
+  nuovoUtente: CreateUserRequest = this.utenteVuoto();
+  nuovoTeam: CreateTeamRequest = { name: '', category: ReportCategory.VIABILITY };
+
+  teamSceltoPerReport: { [reportId: number]: number } = {};
+  operatoreSceltoPerReport: { [reportId: number]: number } = {};
+
+  constructor(
+    private adminService: AdminService,
+    private reportService: ReportService
+  ) {}
+
+  ngOnInit(): void {
+    this.caricaTutto();
+  }
+
+  private utenteVuoto(): CreateUserRequest {
+    return { username: '', email: '', password: '', fullName: '', role: Role.CITIZEN, teamId: null };
+  }
+
+  caricaTutto(): void {
+    this.loading = true;
+
+    this.adminService.getUsers().subscribe({
+      next: (users) => { this.users = users; this.loading = false; },
+      error: () => { this.errore = 'Impossibile caricare gli utenti.'; this.loading = false; }
+    });
+
+    this.adminService.getTeams().subscribe({
+      next: (teams) => this.teams = teams
+    });
+
+    this.reportService.findAll(0, 100).subscribe({
+      next: (response) => this.reports = response.content
+    });
+  }
+
+  private mostraErrore(msg: string): void {
+    this.errore = msg;
+    setTimeout(() => this.errore = null, 2500);
+  }
+
+  private mostraMessaggio(msg: string): void {
+    this.messaggio = msg;
+    setTimeout(() => this.messaggio = null, 2500);
+  }
+
+  get operatori(): AdminUser[] {
+    return this.users.filter(u => u.role === Role.OPERATOR);
+  }
+
+  creaUtente(): void {
+    this.errore = null;
+    this.messaggio = null;
+
+    this.adminService.createUser(this.nuovoUtente).subscribe({
+      next: (utente) => {
+        this.users = [...this.users, utente];
+        this.mostraMessaggio(`Utente ${utente.username} creato.`);
+        this.nuovoUtente = this.utenteVuoto();
+      },
+      error: (err) => {
+        this.mostraErrore(err.status === 409 ? 'Username o email già in uso.' : 'Impossibile creare l\'utente.');
+      }
+    });
+  }
+
+  creaTeam(): void {
+    this.errore = null;
+    this.messaggio = null;
+
+    this.adminService.createTeam(this.nuovoTeam).subscribe({
+      next: (team) => {
+        this.teams = [...this.teams, team];
+        this.mostraMessaggio(`Team ${team.name} creato.`);
+        this.nuovoTeam = { name: '', category: ReportCategory.VIABILITY };
+      },
+      error: () => this.mostraErrore('Impossibile creare il team.')
+    });
+  }
+
+  assegnaTeamUtente(userId: number, teamId: number): void {
+    this.adminService.assignUserTeam(userId, teamId).subscribe({
+      next: (utenteAggiornato) => {
+        this.users = this.users.map(u => u.id === userId ? utenteAggiornato : u);
+        this.mostraMessaggio('Team assegnato all\'operatore.');
+      },
+      error: () => this.mostraErrore('Impossibile assegnare il team.')
+    });
+  }
+
+  assegnaTeamReport(report: Report): void {
+    const teamId = this.teamSceltoPerReport[report.id];
+    if (!teamId) return;
+
+    this.reportService.assignTeam(report.id, teamId).subscribe({
+      next: (aggiornata) => this.aggiornaReportInLista(aggiornata),
+      error: () => this.mostraErrore('Impossibile assegnare il team alla segnalazione.')
+
+    });
+  }
+
+  assegnaOperatoreReport(report: Report): void {
+    const operatorId = this.operatoreSceltoPerReport[report.id];
+    if (!operatorId) return;
+
+    this.reportService.assignOperator(report.id, operatorId).subscribe({
+      next: (aggiornata) => this.aggiornaReportInLista(aggiornata),
+      error: (err) => {
+        this.mostraErrore(err.status === 409
+          ? 'L\'operatore scelto non appartiene al team assegnato.'
+          : 'Impossibile assegnare l\'operatore.');
+      }
+    });
+  }
+
+  private aggiornaReportInLista(aggiornata: Report): void {
+    this.reports = this.reports.map(r => r.id === aggiornata.id ? aggiornata : r);
+    this.mostraMessaggio('Segnalazione aggiornata.');
+  }
+}

@@ -39,4 +39,12 @@ export class ReportService {
   addComment(id: number, message: string): Observable<Update> {
     return this.http.post<Update>(`${API_URL}/${id}/comments`, { message });
   }
+
+  assignTeam(reportId: number, teamId: number): Observable<Report> {
+    return this.http.put<Report>(`${API_URL}/${reportId}/assign-team`, { teamId });
+  }
+
+  assignOperator(reportId: number, operatorId: number): Observable<Report> {
+    return this.http.put<Report>(`${API_URL}/${reportId}/assign-operator`, { operatorId });
+  }
 }

@@ -1,0 +1,8 @@
+.spinner-container { display: flex; justify-content: center; margin-top: 48px; }
+.tab-content { padding: 16px; }
+.form-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-bottom: 24px; }
+.admin-table { width: 100%; border-collapse: collapse; margin-bottom: 32px; }
+.admin-table th, .admin-table td { text-align: left; padding: 8px; border-bottom: 1px solid rgba(128,128,128,0.2); }
+.inline-select { width: 140px; margin-right: 8px; }
+.error-message { color: #c62828; }
+.success-message { color: #2e7d32; }
