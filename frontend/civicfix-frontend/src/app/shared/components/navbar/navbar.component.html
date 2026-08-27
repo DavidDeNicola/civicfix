@@ -1,23 +1,37 @@
-<mat-toolbar color="primary" class="navbar">
-  <span class="app-title" routerLink="/reports">CivicFix</span>
+<div class="sidebar-content">
+  <div class="brand">
+    <span class="brand-icon">🏙️</span>
+    <span class="brand-name">CivicFix</span>
+  </div>
 
-  <span class="spacer"></span>
-
-  @if (authService.isLoggedIn()) {
-    <span class="username">{{ authService.username }} ({{ authService.role }})</span>
-    @if (authService.role === 'ADMIN') {
-      <button mat-button routerLink="/admin">
-        <mat-icon>admin_panel_settings</mat-icon>  Gestione
-      </button>
+  <nav class="nav-links">
+    <a routerLink="/reports" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-link">
+      <mat-icon>list_alt</mat-icon> Segnalazioni
+    </a>
+    @if (authService.role === 'CITIZEN') {
+      <a routerLink="/reports/new" routerLinkActive="active" class="nav-link">
+        <mat-icon>add_circle</mat-icon> Nuova segnalazione
+      </a>
     }
-    <button mat-button (click)="logout()">
-      <mat-icon>logout</mat-icon> Esci
-    </button>
-  } @else if(!isAuthPage){
-    <button mat-button routerLink="/login">Accedi</button>
-  }
+    @if (authService.role === 'ADMIN') {
+      <a routerLink="/admin" routerLinkActive="active" class="nav-link">
+        <mat-icon>admin_panel_settings</mat-icon> Gestione
+      </a>
+    }
+  </nav>
 
-  <button mat-icon-button (click)="themeService.toggleTheme()">
-    <mat-icon>{{ themeService.isDarkTheme ? 'light_mode' : 'dark_mode' }}</mat-icon>
-  </button>
-</mat-toolbar>
+  <div class="sidebar-spacer"></div>
+
+  <div class="sidebar-footer">
+    <button mat-icon-button (click)="themeService.toggleTheme()">
+      <mat-icon>{{ themeService.isDarkTheme ? 'light_mode' : 'dark_mode' }}</mat-icon>
+    </button>
+    <div class="user-info">
+      <span class="username">{{ authService.username }}</span>
+      <span class="role">{{ authService.role }}</span>
+    </div>
+    <button mat-icon-button (click)="logout()">
+      <mat-icon>logout</mat-icon>
+    </button>
+  </div>
+</div>

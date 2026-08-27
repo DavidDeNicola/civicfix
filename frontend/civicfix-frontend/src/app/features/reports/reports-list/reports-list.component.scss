@@ -1,20 +1,26 @@
-.spinner-container {
-  display: flex;
-  justify-content: center;
-  margin-top: 48px;
-}
-.reports-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 16px;
-  padding: 16px;
-}
-.report-card {
-  height: 100%;
-}
-.error-message {
-  color: #c62828;
-  text-align: center;
-}
+.page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; }
+.page-header h1 { font-family: 'Poppins', sans-serif; font-size: 1.6rem; margin: 0; }
 
-.new-report-btn { margin: 16px; }
+.create-btn {
+  background: linear-gradient(135deg, #7c4dff, #5e35b1);
+  color: #fff; border: none; border-radius: 999px; padding: 10px 22px;
+  font-weight: 600; font-size: 0.9rem; cursor: pointer;
+  display: flex; align-items: center; gap: 6px;
+  box-shadow: 0 4px 14px rgba(124, 77, 255, 0.35);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.create-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(124, 77, 255, 0.45); }
+
+.spinner-container { display: flex; justify-content: center; margin-top: 48px; }
+.reports-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+
+.status-section { margin-bottom: 36px; }
+.section-title {
+  font-family: 'Poppins', sans-serif; font-size: 1.1rem;
+  margin-bottom: 14px; padding-bottom: 8px;
+  border-bottom: 2px solid rgba(128,128,128,0.15);
+}
+.empty-hint { color: #888; font-size: 0.9rem; }
+.error-message { color: #c62828; }
+
+:host-context(.dark-theme) .page-header h1 { color: #fff; }

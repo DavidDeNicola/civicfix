@@ -1,9 +1,17 @@
 @use '@angular/material' as mat;
 @import 'leaflet/dist/leaflet.css';
+
 html {
   @include mat.theme((
-    color: mat.$azure-palette,
-    typography: Roboto,
+    color: (
+      theme-type: light,
+      primary: mat.$violet-palette,
+      tertiary: mat.$orange-palette
+    ),
+    typography: (
+      brand-family: 'Poppins',
+      plain-family: 'Inter'
+    ),
     density: 0
   ));
 }
@@ -12,18 +20,35 @@ html {
   @include mat.theme((
     color: (
       theme-type: dark,
-      primary: mat.$azure-palette,
+      primary: mat.$violet-palette,
+      tertiary: mat.$orange-palette
     ),
-    typography: Roboto,
+    typography: (
+      brand-family: 'Poppins',
+      plain-family: 'Inter'
+    ),
     density: 0
   ));
-
   background-color: #121212;
   color: #ffffff;
 }
 
 body {
   margin: 0;
-  background-color: #f5f5f5;
-  transition: background-color 0.2s
+  font-family: 'Inter', sans-serif;
+  background-color: #f5f5f7;
+  transition: background-color 0.2s ease;
+}
+
+mat-card, .mat-mdc-card {
+  border-radius: 16px !important;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08) !important;
+}
+
+mat-chip, .mat-mdc-chip {
+  border-radius: 999px !important;
+}
+
+h1, h2, h3, .mat-mdc-card-title {
+  font-family: 'Poppins', sans-serif !important;
 }

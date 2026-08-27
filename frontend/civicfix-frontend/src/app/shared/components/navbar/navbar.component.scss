@@ -1,17 +1,67 @@
-.navbar {
-  position: sticky;
-  top: 0;
-  z-index: 10;
+.sidebar-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 16px 12px;
+  box-sizing: border-box;
 }
-.app-title {
-  cursor: pointer;
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px 24px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  font-size: 1.3rem;
+}
+.brand-icon { font-size: 1.4rem; }
+.nav-links {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  text-decoration: none;
+  color: inherit;
   font-weight: 500;
-  font-size: 1.2rem;
+  transition: background-color 0.15s ease;
 }
-.spacer {
+.nav-link:hover {
+  background-color: rgba(128, 128, 128, 0.1);
+}
+.nav-link.active {
+  background-color: rgba(103, 80, 164, 0.15);
+  color: #6750a4;
+}
+.sidebar-spacer {
   flex: 1 1 auto;
 }
+.sidebar-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  border-top: 1px solid rgba(128, 128, 128, 0.15);
+}
+.user-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+}
 .username {
-  margin-right: 8px;
+  font-weight: 600;
   font-size: 0.9rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.role {
+  font-size: 0.75rem;
+  color: #888;
 }

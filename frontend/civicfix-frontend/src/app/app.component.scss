@@ -1,11 +1,20 @@
-.theme-toggle {
-  position: fixed;
-  top: 16px;
-  right: 16px;
-  z-index: 1000;
-  padding: 8px 16px;
-  border-radius: 20px;
-  border: 1px solid #ccc;
-  background: white;
-  cursor: pointer;
+.app-shell {
+  height: 100vh;
+}
+.sidebar {
+  width: 240px;
+  background-color: #ffffff;
+  border-right: none !important;
+  box-shadow: 2px 0 16px rgba(0, 0, 0, 0.08);
+  z-index: 2;
+}
+.content-area {
+  padding: 32px;
+  box-sizing: border-box;
+  background-color: #f0f0f5;
+}
+
+:host-context(.dark-theme) {
+  .sidebar { background-color: #1e1e1e; }
+  .content-area { background-color: #121212; }
 }

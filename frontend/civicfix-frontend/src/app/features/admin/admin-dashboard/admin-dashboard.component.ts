@@ -85,6 +85,10 @@ export class AdminDashboardComponent implements OnInit {
     return this.users.filter(u => u.role === Role.OPERATOR);
   }
 
+  puoEssereAssegnata(report: Report): boolean {
+    return report.status !== 'RESOLVED' && report.status !== 'REJECTED';
+  }
+
   creaUtente(): void {
     this.errore = null;
     this.messaggio = null;

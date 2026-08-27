@@ -1,4 +1,3 @@
-<p>admin-dashboard works!</p>
 @if (loading) {
   <div class="spinner-container"><mat-spinner></mat-spinner></div>
 } @else {
@@ -60,7 +59,7 @@
               <tr>
                 <td>{{ utente.username }}</td>
                 <td>{{ utente.email }}</td>
-                <td>{{ utente.role }}</td>
+                <td><span class="role-badge" [ngClass]="'role-' + utente.role.toLowerCase()">{{ utente.role }}</span></td>
                 <td>{{ utente.teamName ?? '—' }}</td>
                 <td>
                   @if (utente.role === 'OPERATOR') {
@@ -128,28 +127,36 @@
             @for (report of reports; track report.id) {
               <tr>
                 <td>{{ report.title }}</td>
-                <td>{{ report.status }}</td>
+                <td><span class="status-badge" [ngClass]="'status-' + report.status.toLowerCase()">{{ report.status }}</span></td>
                 <td>{{ report.assignedTeamName ?? '—' }}</td>
                 <td>
-                  <mat-form-field appearance="outline" class="inline-select">
-                    <mat-select [(ngModel)]="teamSceltoPerReport[report.id]">
-                      @for (team of teams; track team.id) {
-                        <mat-option [value]="team.id">{{ team.name }}</mat-option>
-                      }
-                    </mat-select>
-                  </mat-form-field>
-                  <button mat-button (click)="assegnaTeamReport(report)">Assegna</button>
+                  @if (puoEssereAssegnata(report)) {
+                    <mat-form-field appearance="outline" class="inline-select">
+                      <mat-select [(ngModel)]="teamSceltoPerReport[report.id]">
+                        @for (team of teams; track team.id) {
+                          <mat-option [value]="team.id">{{ team.name }}</mat-option>
+                        }
+                      </mat-select>
+                    </mat-form-field>
+                    <button mat-button (click)="assegnaTeamReport(report)">Assegna</button>
+                  } @else {
+                    <span class="closed-hint">Segnalazione chiusa</span>
+                  }
                 </td>
                 <td>{{ report.assignedOperatorUsername ?? '—' }}</td>
                 <td>
-                  <mat-form-field appearance="outline" class="inline-select">
-                    <mat-select [(ngModel)]="operatoreSceltoPerReport[report.id]">
-                      @for (operatore of operatori; track operatore.id) {
-                        <mat-option [value]="operatore.id">{{ operatore.username }}</mat-option>
-                      }
-                    </mat-select>
-                  </mat-form-field>
-                  <button mat-button (click)="assegnaOperatoreReport(report)">Assegna</button>
+                  @if (puoEssereAssegnata(report)) {
+                    <mat-form-field appearance="outline" class="inline-select">
+                      <mat-select [(ngModel)]="operatoreSceltoPerReport[report.id]">
+                        @for (operatore of operatori; track operatore.id) {
+                          <mat-option [value]="operatore.id">{{ operatore.username }}</mat-option>
+                        }
+                      </mat-select>
+                    </mat-form-field>
+                    <button mat-button (click)="assegnaOperatoreReport(report)">Assegna</button>
+                  } @else {
+                    <span class="closed-hint">—</span>
+                  }
                 </td>
               </tr>
             }

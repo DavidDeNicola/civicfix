@@ -1,0 +1,13 @@
+<div class="report-card" [ngClass]="'accent-' + report.category.toLowerCase()" [routerLink]="['/reports', report.id]">
+  <div class="card-top">
+    <div class="category-icon" [ngClass]="'cat-' + report.category.toLowerCase()">
+      {{ icona }}
+    </div>
+    <div class="card-title-group">
+      <h3>{{ report.title }}</h3>
+      <span class="address">{{ report.address }}</span>
+    </div>
+  </div>
+  <p class="description">{{ report.description }}</p>
+  <span class="status-badge" [ngClass]="'status-' + report.status.toLowerCase()">{{ report.status }}</span>
+</div>

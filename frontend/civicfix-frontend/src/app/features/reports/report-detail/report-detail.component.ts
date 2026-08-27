@@ -13,6 +13,7 @@ import { ReportService } from '../../../core/services/report.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { Report, ReportPhoto, ReportStatus, Update } from '../../../core/models/report.model';
 import { Role } from '../../../core/models/user.model';
+import { ICONE_CATEGORIA } from '../../../core/constants/category-icons';
 
 const PHOTO_BASE_URL = 'http://localhost:8080';
 
@@ -117,5 +118,9 @@ export class ReportDetailComponent implements OnInit {
         this.salvataggioInCorso = false;
       }
     });
+  }
+
+  get iconaCategoria(): string {
+    return ICONE_CATEGORIA[this.report?.category ?? ''] ?? '📍';
   }
 }
