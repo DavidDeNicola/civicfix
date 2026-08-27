@@ -1,7 +1,16 @@
 import { Injectable } from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {CreateReportRequest, PagedResponse, Report, ReportPhoto, ReportStatus, Update} from '../models/report.model';
+import {
+  CreateReportRequest,
+  PagedResponse,
+  Report,
+  ReportPhoto,
+  ReportPriority,
+  ReportStatus,
+  Update,
+  AssignPriorityRequest
+} from '../models/report.model';
 
 const API_URL = 'http://localhost:8080/api/reports';
 
@@ -56,5 +65,9 @@ export class ReportService {
     const formData = new FormData();
     formData.append('file', file);
     return this.http.post<ReportPhoto>(`${API_URL}/${reportId}/photos`, formData);
+  }
+
+  assignPriority(reportId: number, priority: ReportPriority): Observable<Report> {
+    return this.http.put<Report>(`${API_URL}/${reportId}/priority`, { priority });
   }
 }

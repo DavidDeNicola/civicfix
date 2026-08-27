@@ -1,4 +1,3 @@
-import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
@@ -14,6 +13,8 @@ import { AuthService } from '../../../core/services/auth.service';
 import { Report, ReportPhoto, ReportStatus, Update } from '../../../core/models/report.model';
 import { Role } from '../../../core/models/user.model';
 import { ICONE_CATEGORIA } from '../../../core/constants/category-icons';
+import { Component, ElementRef, OnInit, AfterViewInit, OnDestroy, ViewChild } from '@angular/core';
+import * as L from 'leaflet';
 
 const PHOTO_BASE_URL = 'http://localhost:8080';
 
@@ -27,12 +28,14 @@ const PHOTO_BASE_URL = 'http://localhost:8080';
   templateUrl: './report-detail.component.html',
   styleUrl: './report-detail.component.scss'
 })
-export class ReportDetailComponent implements OnInit {
+export class ReportDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   report: Report | null = null;
   photos: ReportPhoto[] = [];
   updates: Update[] = [];
   loading: boolean = true;
   errore: string | null = null;
+  @ViewChild('detailMap') mapContainer!: ElementRef<HTMLDivElement>;
+  private map: L.Map | null = null;
 
   nuovoCommento: string = '';
   nuovoStato: ReportStatus | null = null;
@@ -54,6 +57,26 @@ export class ReportDetailComponent implements OnInit {
     });
   }
 
+  ngAfterViewInit(): void {
+  }
+
+  ngOnDestroy(): void {
+    this.map?.remove();
+  }
+  private inizializzaMappa(): void {
+    if (!this.report || this.map) return;
+
+    this.map = L.map(this.mapContainer.nativeElement).setView(
+      [this.report.latitude, this.report.longitude], 16
+    );
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(this.map);
+
+    L.marker([this.report.latitude, this.report.longitude]).addTo(this.map);
+  }
+
   get puoGestireStato(): boolean {
     const role = this.authService.role;
     return role === Role.OPERATOR || role === Role.ADMIN;
@@ -68,6 +91,7 @@ export class ReportDetailComponent implements OnInit {
         this.report = report;
         this.nuovoStato = report.status;
         this.loading = false;
+        setTimeout(() => this.inizializzaMappa());
       },
       error: () => {
         this.errore = 'Segnalazione non trovata.';

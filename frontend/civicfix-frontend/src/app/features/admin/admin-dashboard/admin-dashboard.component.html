@@ -121,7 +121,7 @@
       <div class="tab-content">
         <table class="admin-table">
           <thead>
-          <tr><th>Titolo</th><th>Stato</th><th>Team assegnato</th><th>Assegna team</th><th>Operatore assegnato</th><th>Assegna operatore</th></tr>
+          <tr><th>Titolo</th><th>Stato</th><th>Team assegnato</th><th>Assegna team</th><th>Operatore assegnato</th><th>Assegna operatore</th><th>Priorità</th></tr>
           </thead>
           <tbody>
             @for (report of reports; track report.id) {
@@ -156,6 +156,20 @@
                     <button mat-button (click)="assegnaOperatoreReport(report)">Assegna</button>
                   } @else {
                     <span class="closed-hint">—</span>
+                  }
+                </td>
+                <td>
+                  @if (puoEssereAssegnata(report)) {
+                    <mat-form-field appearance="outline" class="inline-select">
+                      <mat-select [(ngModel)]="prioritaSceltaPerReport[report.id]">
+                        @for (p of prioritaDisponibili; track p) {
+                          <mat-option [value]="p">{{ p }}</mat-option>
+                        }
+                      </mat-select>
+                    </mat-form-field>
+                    <button mat-button (click)="assegnaPriorita(report)">Assegna</button>
+                  } @else {
+                    <span class="priority-badge" [ngClass]="'priority-' + report.priority.toLowerCase()">{{ report.priority }}</span>
                   }
                 </td>
               </tr>

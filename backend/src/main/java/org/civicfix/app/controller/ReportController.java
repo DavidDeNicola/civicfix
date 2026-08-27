@@ -14,6 +14,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.civicfix.app.dto.AssignPriorityRequest;
 
 import java.util.List;
 
@@ -62,6 +63,14 @@ public class ReportController {
     public ResponseEntity<ReportResponse> assignOperator(
             @PathVariable Long id, @Valid @RequestBody AssignOperatorRequest request) {
         return ResponseEntity.ok(reportService.assignOperator(id, request.operatorId()));
+    }
+
+    @PutMapping("/{id}/priority")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ReportResponse> assignPriority(
+            @PathVariable Long id,
+            @RequestBody AssignPriorityRequest request) {
+        return ResponseEntity.ok(reportService.assignPriority(id, request.priority()));
     }
 
     @PutMapping("/{id}/status")

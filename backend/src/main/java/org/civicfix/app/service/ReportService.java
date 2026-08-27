@@ -13,6 +13,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.civicfix.app.model.ReportPriority;
 
 import java.util.List;
 
@@ -106,6 +107,9 @@ public class ReportService {
     public ReportResponse changeStatus(Long reportId, ReportStatus newStatus, String message, Long currentUserId) {
         Report report = reportRepository.findById(reportId)
                 .orElseThrow(() -> new IllegalArgumentException("Segnalazione non trovata"));
+        if (report.getStatus() == ReportStatus.RESOLVED || report.getStatus() == ReportStatus.REJECTED) {
+            throw new IllegalArgumentException("Una segnalazione chiusa non può cambiare stato");
+        }
         User currentUser = userRepository.findById(currentUserId)
                 .orElseThrow(() -> new IllegalArgumentException("Utente non trovato"));
 
@@ -173,6 +177,14 @@ public class ReportService {
     public List<ReportPhotoResponse> getPhotos(Long reportId) {
         return reportPhotoRepository.findByReportId(reportId)
                 .stream().map(ReportPhotoResponse::from).toList();
+    }
+
+    public ReportResponse assignPriority(Long reportId, ReportPriority priority) {
+        Report report = reportRepository.findById(reportId)
+                .orElseThrow(() -> new IllegalArgumentException("Segnalazione non trovata"));
+        report.setPriority(priority);
+        reportRepository.save(report);
+        return ReportResponse.from(report);
     }
 }
 

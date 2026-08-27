@@ -37,3 +37,9 @@
   color: #999;
   font-style: italic;
 }
+
+.priority-badge { padding: 3px 11px; border-radius: 999px; font-size: 0.7rem; font-weight: 700; color: #fff; display: inline-block; }
+.priority-low    { background: #78909c; }
+.priority-normal { background: #1e88e5; }
+.priority-high   { background: #fb8c00; }
+.priority-urgent { background: #e53935; }

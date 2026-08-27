@@ -20,6 +20,7 @@ export interface Report {
   description: string;
   category: ReportCategory;
   status: ReportStatus;
+  priority: ReportPriority;
   latitude: number;
   longitude: number;
   address?: string;
@@ -66,4 +67,15 @@ export interface CreateReportRequest {
   latitude: number;
   longitude: number;
   address: string;
+}
+
+export enum ReportPriority {
+  LOW = 'LOW',
+  NORMAL = 'NORMAL',
+  HIGH = 'HIGH',
+  URGENT = 'URGENT'
+}
+
+export interface AssignPriorityRequest {
+  priority: ReportPriority;
 }

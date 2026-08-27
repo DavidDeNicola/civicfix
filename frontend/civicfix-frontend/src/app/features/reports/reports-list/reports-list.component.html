@@ -1,52 +1,89 @@
-<div class="page-header">
-  <h1>Segnalazioni</h1>
-  @if (authService.role === 'CITIZEN') {
-    <button class="create-btn" routerLink="/reports/new">
-      <span>+</span> Nuova segnalazione
-    </button>
-  }
-</div>
+<div class="reports-page">
 
-@if (loading) {
-  <div class="spinner-container"><mat-spinner></mat-spinner></div>
-} @else if (errore) {
-  <p class="error-message">{{ errore }}</p>
-} @else if (reports.length === 0) {
-  <p>Nessuna segnalazione trovata.</p>
-} @else if (isAdmin) {
+  <aside class="filters-sidebar">
+    <h3>Filtri</h3>
 
-  <div class="reports-grid">
-    @for (report of reports; track report.id) {
-      <app-report-card [report]="report"></app-report-card>
+    <label class="filter-label">Cerca per titolo</label>
+    <input type="text" class="filter-input" [(ngModel)]="ricerca" placeholder="Es. buca, lampione...">
+
+    <label class="filter-label">Stato</label>
+    <div class="checkbox-group">
+      @for (stato of statiDisponibiliFiltro; track stato) {
+        <mat-checkbox [checked]="statiSelezionati.has(stato)" (change)="toggleStato(stato)">
+          {{ stato }}
+        </mat-checkbox>
+      }
+    </div>
+
+    <label class="filter-label">Categoria</label>
+    <div class="checkbox-group">
+      @for (categoria of categorieDisponibili; track categoria) {
+        <mat-checkbox [checked]="categorieSelezionate.has(categoria)" (change)="toggleCategoria(categoria)">
+          {{ categoria }}
+        </mat-checkbox>
+      }
+    </div>
+
+    <label class="filter-label">Data di aggiunta</label>
+    <div class="date-range">
+      <input type="date" class="filter-input" [(ngModel)]="dataDa">
+      <span>–</span>
+      <input type="date" class="filter-input" [(ngModel)]="dataA">
+    </div>
+  </aside>
+
+  <div class="reports-main">
+    <div class="page-header">
+      <h1>Segnalazioni</h1>
+      @if (authService.role === 'CITIZEN') {
+        <button class="create-btn" routerLink="/reports/new"><span>+</span> Nuova segnalazione</button>
+      }
+    </div>
+
+    @if (loading) {
+      <div class="spinner-container"><mat-spinner></mat-spinner></div>
+    } @else if (errore) {
+      <p class="error-message">{{ errore }}</p>
+    } @else if (isAdmin) {
+
+      @if (tutteFiltrate.length === 0) {
+        <p class="empty-hint">Nessuna segnalazione corrisponde ai filtri.</p>
+      } @else {
+        <div class="reports-list-col">
+          @for (report of tutteFiltrate; track report.id) {
+            <app-report-card [report]="report"></app-report-card>
+          }
+        </div>
+      }
+
+    } @else {
+
+      <section class="status-section">
+        <h2 class="section-title">In corso</h2>
+        @if (inCorso.length === 0) {
+          <p class="empty-hint">Nessuna segnalazione in corso.</p>
+        } @else {
+          <div class="reports-list-col">
+            @for (report of inCorso; track report.id) {
+              <app-report-card [report]="report"></app-report-card>
+            }
+          </div>
+        }
+      </section>
+
+      <section class="status-section">
+        <h2 class="section-title">In attesa</h2>
+        @if (inAttesa.length === 0) {
+          <p class="empty-hint">Nessuna segnalazione in attesa.</p>
+        } @else {
+          <div class="reports-list-col">
+            @for (report of inAttesa; track report.id) {
+              <app-report-card [report]="report"></app-report-card>
+            }
+          </div>
+        }
+      </section>
+
     }
   </div>
-
-} @else {
-
-  <section class="status-section">
-    <h2 class="section-title">In corso</h2>
-    @if (inCorso.length === 0) {
-      <p class="empty-hint">Nessuna segnalazione in corso al momento.</p>
-    } @else {
-      <div class="reports-grid">
-        @for (report of inCorso; track report.id) {
-          <app-report-card [report]="report"></app-report-card>
-        }
-      </div>
-    }
-  </section>
-
-  <section class="status-section">
-    <h2 class="section-title">In attesa</h2>
-    @if (inAttesa.length === 0) {
-      <p class="empty-hint">Nessuna segnalazione in attesa.</p>
-    } @else {
-      <div class="reports-grid">
-        @for (report of inAttesa; track report.id) {
-          <app-report-card [report]="report"></app-report-card>
-        }
-      </div>
-    }
-  </section>
-
-}
+</div>

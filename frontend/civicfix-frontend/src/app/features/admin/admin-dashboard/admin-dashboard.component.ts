@@ -12,6 +12,7 @@ import { ReportService } from '../../../core/services/report.service';
 import { AdminUser, CreateUserRequest, CreateTeamRequest, Team } from '../../../core/models/admin.model';
 import { Role } from '../../../core/models/user.model';
 import { Report, ReportCategory } from '../../../core/models/report.model';
+import { ReportPriority } from '../../../core/models/report.model';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -39,6 +40,8 @@ export class AdminDashboardComponent implements OnInit {
   nuovoTeam: CreateTeamRequest = { name: '', category: ReportCategory.VIABILITY };
 
   teamSceltoPerReport: { [reportId: number]: number } = {};
+  prioritaDisponibili = Object.values(ReportPriority);
+  prioritaSceltaPerReport: { [reportId: number]: ReportPriority } = {};
   operatoreSceltoPerReport: { [reportId: number]: number } = {};
 
   constructor(
@@ -151,6 +154,16 @@ export class AdminDashboardComponent implements OnInit {
           ? 'L\'operatore scelto non appartiene al team assegnato.'
           : 'Impossibile assegnare l\'operatore.');
       }
+    });
+  }
+
+  assegnaPriorita(report: Report): void {
+    const priorita = this.prioritaSceltaPerReport[report.id];
+    if (!priorita) return;
+
+    this.reportService.assignPriority(report.id, priorita).subscribe({
+      next: (aggiornata) => this.aggiornaReportInLista(aggiornata),
+      error: () => this.mostraErrore('Impossibile assegnare la priorità.')
     });
   }
 

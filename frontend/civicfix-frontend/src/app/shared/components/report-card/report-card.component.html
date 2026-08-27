@@ -1,13 +1,18 @@
 <div class="report-card" [ngClass]="'accent-' + report.category.toLowerCase()" [routerLink]="['/reports', report.id]">
-  <div class="card-top">
-    <div class="category-icon" [ngClass]="'cat-' + report.category.toLowerCase()">
-      {{ icona }}
-    </div>
-    <div class="card-title-group">
+  <div class="category-icon" [ngClass]="'cat-' + report.category.toLowerCase()">{{ icona }}</div>
+
+  <div class="card-main">
+    <div class="card-title-row">
       <h3>{{ report.title }}</h3>
-      <span class="address">{{ report.address }}</span>
+      <span class="priority-badge" [ngClass]="'priority-' + report.priority.toLowerCase()">{{ report.priority }}</span>
+    </div>
+    <span class="address">📍 {{ report.address }}</span>
+    <p class="description">{{ report.description }}</p>
+    <div class="card-footer">
+      <span class="status-badge" [ngClass]="'status-' + report.status.toLowerCase()">{{ report.status }}</span>
+      <span class="date">{{ report.createdAt | date:'dd/MM/yyyy' }}</span>
     </div>
   </div>
-  <p class="description">{{ report.description }}</p>
-  <span class="status-badge" [ngClass]="'status-' + report.status.toLowerCase()">{{ report.status }}</span>
+
+  <div class="mini-map" #miniMap></div>
 </div>

@@ -37,6 +37,10 @@ public class Report {
     @Column(nullable = false)
     private ReportStatus status = ReportStatus.PENDING;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ReportPriority priority = ReportPriority.NORMAL;
+
     @Column(nullable = false)
     private Double latitude;
 

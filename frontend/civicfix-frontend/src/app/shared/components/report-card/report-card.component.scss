@@ -1,16 +1,11 @@
 .report-card {
-  background: #ffffff;
-  border-radius: 16px;
-  padding: 20px;
-  cursor: pointer;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
-  border-left: 5px solid transparent;
+  display: flex; align-items: stretch; gap: 16px;
+  background: #ffffff; border-radius: 16px; padding: 18px 20px;
+  cursor: pointer; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+  border-left: 5px solid transparent; width: 100%; box-sizing: border-box;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
-.report-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.14);
-}
+.report-card:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(0, 0, 0, 0.14); }
 
 .accent-viability   { border-left-color: #fb8c00; }
 .accent-lighting    { border-left-color: #fdd835; }
@@ -19,11 +14,10 @@
 .accent-water       { border-left-color: #039be5; }
 .accent-other       { border-left-color: #8e24aa; }
 
-.card-top { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 12px; }
 .category-icon {
-  width: 44px; height: 44px; border-radius: 50%;
+  width: 52px; height: 52px; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  font-size: 1.3rem; flex-shrink: 0;
+  font-size: 1.5rem; flex-shrink: 0;
 }
 .cat-viability   { background: #ffe0b2; }
 .cat-lighting    { background: #fff9c4; }
@@ -32,20 +26,34 @@
 .cat-water       { background: #b3e5fc; }
 .cat-other       { background: #e1bee7; }
 
-.card-title-group h3 { margin: 0 0 2px; font-family: 'Poppins', sans-serif; font-size: 1.05rem; }
+.card-main { flex: 1; min-width: 0; }
+.card-title-row { display: flex; align-items: center; gap: 10px; margin-bottom: 2px; }
+.card-title-row h3 { margin: 0; font-family: 'Poppins', sans-serif; font-size: 1.05rem; }
 .address { font-size: 0.8rem; color: #888; }
-.description { font-size: 0.9rem; color: #555; margin: 0 0 14px; }
+.description {
+  font-size: 0.9rem; color: #555; margin: 8px 0 12px;
+  overflow: hidden; text-overflow: ellipsis; display: -webkit-box;
+  -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+}
+.card-footer { display: flex; align-items: center; gap: 12px; }
+.date { font-size: 0.78rem; color: #999; }
 
-.status-badge {
-  padding: 4px 12px; border-radius: 999px; font-size: 0.72rem;
+.status-badge, .priority-badge {
+  padding: 4px 12px; border-radius: 999px; font-size: 0.7rem;
   font-weight: 700; color: #fff; letter-spacing: 0.3px; display: inline-block;
 }
 .status-pending     { background: #fb8c00; }
 .status-in_progress { background: #1e88e5; }
 .status-resolved    { background: #43a047; }
 .status-rejected    { background: #e53935; }
+.priority-low    { background: #78909c; }
+.priority-normal { background: #1e88e5; }
+.priority-high   { background: #fb8c00; }
+.priority-urgent { background: #e53935; }
+
+.mini-map { width: 140px; border-radius: 12px; flex-shrink: 0; overflow: hidden; }
 
 :host-context(.dark-theme) {
   .report-card { background: #1e1e1e; }
-  .address, .description { color: #aaa; }
+  .address, .description, .date { color: #aaa; }
 }
