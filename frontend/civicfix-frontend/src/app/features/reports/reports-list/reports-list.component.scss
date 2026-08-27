@@ -59,3 +59,98 @@
 }
 .empty-hint { color: var(--color-muted-foreground); font-size: 0.9rem; }
 .error-message { color: var(--color-destructive); }
+
+// --- Vicino a me ---------------------------------------------------------
+
+.vicinanza { display: flex; flex-direction: column; gap: 8px; }
+
+.sotto-etichetta {
+  font-size: 0.75rem;
+  color: var(--color-muted-foreground);
+}
+
+.btn-posizione {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  min-height: 40px; padding: 8px 12px;
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-accent);
+  font: inherit; font-size: 0.85rem; font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+.btn-posizione:hover:not(:disabled) { background: rgba(3, 105, 161, 0.1); }
+.btn-posizione:disabled { opacity: 0.6; cursor: default; }
+.btn-posizione mat-icon { font-size: 18px; width: 18px; height: 18px; }
+
+.posizione-attiva {
+  display: flex; align-items: center; gap: 6px;
+  margin: 0; font-size: 0.85rem; color: var(--status-resolved);
+}
+.posizione-attiva .mini { font-size: 16px; width: 16px; height: 16px; }
+
+.btn-testo {
+  align-self: flex-start;
+  padding: 6px 0;
+  border: none; background: none;
+  color: var(--color-accent);
+  font: inherit; font-size: 0.82rem;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.errore-posizione {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--color-destructive);
+}
+
+// --- Selettore elenco / mappa -------------------------------------------
+
+.selettore-vista {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  margin-bottom: 20px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-surface);
+}
+.selettore-vista button {
+  display: inline-flex; align-items: center; gap: 6px;
+  min-height: 36px; padding: 6px 16px;
+  border: none; border-radius: 999px;
+  background: transparent;
+  color: var(--color-muted-foreground);
+  font: inherit; font-size: 0.85rem; font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.selettore-vista button mat-icon { font-size: 18px; width: 18px; height: 18px; }
+.selettore-vista button:hover { color: var(--color-foreground); }
+.selettore-vista button.attiva {
+  background: var(--color-accent);
+  color: #fff;
+}
+
+.mappa-insieme {
+  display: block;
+  // Altezza esplicita: Leaflet non può calcolarla da un contenitore che si
+  // dimensiona sul contenuto, e resterebbe alto zero.
+  height: min(65vh, 560px);
+}
+
+// La mappa mostra la pagina corrente, non l'intero archivio: senza questa
+// precisazione sembrerebbe che manchino dei segnaposti.
+.nota-mappa {
+  margin: 10px 0 0;
+  font-size: 0.8rem;
+  color: var(--color-muted-foreground);
+}
+
+mat-paginator {
+  margin-top: 16px;
+  border-radius: var(--radius-lg);
+  background: transparent;
+}

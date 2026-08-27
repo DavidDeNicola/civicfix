@@ -83,3 +83,18 @@
   border-radius: var(--radius-md);
   margin-top: 16px;
 }
+
+.azioni-autore {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-border);
+}
+.btn-elimina { color: var(--color-destructive); }
+.nota-azioni {
+  font-size: 0.78rem;
+  color: var(--color-muted-foreground);
+}

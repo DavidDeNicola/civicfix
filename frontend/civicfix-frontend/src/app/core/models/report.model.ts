@@ -24,11 +24,18 @@ export interface Report {
   latitude: number;
   longitude: number;
   address?: string;
-  reporterUsername: string;
+  reportedUsername: string;
   assignedTeamName?: string;
   assignedOperatorUsername?: string;
+  voteCount: number;
+  votedByCurrentUser: boolean;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface VoteResponse {
+  voteCount: number;
+  votedByCurrentUser: boolean;
 }
 
 export interface PagedResponse<T> {

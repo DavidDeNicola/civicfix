@@ -1,5 +1,5 @@
 <mat-card class="create-card">
-  <mat-card-title>Nuova segnalazione</mat-card-title>
+  <mat-card-title>{{ inModifica ? 'Modifica segnalazione' : 'Nuova segnalazione' }}</mat-card-title>
   <mat-card-content>
 
     @if (errore) { <p class="error-message">{{ errore }}</p> }
@@ -41,7 +41,7 @@
     </div>
 
     <button mat-raised-button color="primary" [disabled]="salvataggioInCorso" (click)="invia()">
-      Invia segnalazione
+      {{ inModifica ? 'Salva modifiche' : 'Invia segnalazione' }}
     </button>
   </mat-card-content>
 </mat-card>

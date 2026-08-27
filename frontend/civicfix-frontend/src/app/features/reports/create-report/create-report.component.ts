@@ -1,7 +1,7 @@
-import { Component, ElementRef, AfterViewInit, OnDestroy, ViewChild } from '@angular/core';
+import { Component, ElementRef, AfterViewInit, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import * as L from 'leaflet';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -20,7 +20,7 @@ import { CategoriaPipe } from '../../../core/pipes/etichette.pipe';
   templateUrl: './create-report.component.html',
   styleUrl: './create-report.component.scss'
 })
-export class CreateReportComponent implements AfterViewInit, OnDestroy {
+export class CreateReportComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('mapContainer') mapContainer!: ElementRef<HTMLDivElement>;
 
   private map: L.Map | null = null;
@@ -28,6 +28,9 @@ export class CreateReportComponent implements AfterViewInit, OnDestroy {
   private resizeObserver: ResizeObserver | null = null;
 
   categorieDisponibili = Object.values(ReportCategory);
+
+  /** Valorizzato solo sulla rotta di modifica: lo stesso form serve entrambi i casi. */
+  idInModifica: number | null = null;
 
   titolo: string = '';
   descrizione: string = '';
@@ -38,9 +41,44 @@ export class CreateReportComponent implements AfterViewInit, OnDestroy {
 
   fileSelezionati: File[] = [];
   salvataggioInCorso: boolean = false;
+  caricamento: boolean = false;
   errore: string | null = null;
 
-  constructor(private reportService: ReportService, private router: Router) {}
+  constructor(
+    private reportService: ReportService,
+    private router: Router,
+    private route: ActivatedRoute
+  ) {}
+
+  get inModifica(): boolean {
+    return this.idInModifica !== null;
+  }
+
+  ngOnInit(): void {
+    const id = this.route.snapshot.paramMap.get('id');
+    if (!id) return;
+
+    this.idInModifica = Number(id);
+    this.caricamento = true;
+
+    this.reportService.findById(this.idInModifica).subscribe({
+      next: (report) => {
+        this.titolo = report.title;
+        this.descrizione = report.description;
+        this.categoria = report.category;
+        this.indirizzo = report.address ?? '';
+        this.caricamento = false;
+        // La mappa può essere già pronta (ngAfterViewInit precede la
+        // risposta HTTP): il segnaposto va messo appena si hanno le coordinate.
+        this.impostaPosizione(report.latitude, report.longitude);
+        this.map?.setView([report.latitude, report.longitude], 16);
+      },
+      error: () => {
+        this.errore = 'Impossibile caricare la segnalazione da modificare.';
+        this.caricamento = false;
+      }
+    });
+  }
 
   ngAfterViewInit(): void {
     this.inizializzaMappa();
@@ -105,6 +143,19 @@ export class CreateReportComponent implements AfterViewInit, OnDestroy {
     };
 
     this.salvataggioInCorso = true;
+
+    if (this.inModifica) {
+      this.reportService.update(this.idInModifica!, dto).subscribe({
+        next: (report) => this.caricaFotoESpostati(report.id),
+        error: (err) => {
+          // Il backend rifiuta la modifica se la segnalazione è già stata
+          // presa in carico: quel messaggio dice all'utente cos'è successo.
+          this.errore = err.error?.message ?? 'Impossibile aggiornare la segnalazione.';
+          this.salvataggioInCorso = false;
+        }
+      });
+      return;
+    }
 
     this.reportService.createReport(dto).subscribe({
       next: (report) => this.caricaFotoESpostati(report.id),

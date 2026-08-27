@@ -187,6 +187,37 @@ body.dark-theme {
   }
 }
 
+// I popup di Leaflet vengono agganciati fuori dall'albero del componente,
+// quindi gli stili incapsulati non li raggiungono.
+.popup-segnalazione {
+  font-family: 'Inter', sans-serif;
+  min-width: 170px;
+}
+.popup-segnalazione strong {
+  display: block;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.95rem;
+  margin-bottom: 4px;
+}
+.popup-segnalazione .popup-meta {
+  font-size: 0.8rem;
+  color: #475569;
+}
+.popup-segnalazione .popup-apri {
+  margin-top: 10px;
+  width: 100%;
+  padding: 7px 12px;
+  border: none;
+  border-radius: 999px;
+  background: #0369a1;
+  color: #fff;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.popup-segnalazione .popup-apri:hover { background: #075985; }
+
 // Leaflet paints .leaflet-div-icon with a white box + border by default;
 // our marker is a bare SVG pin, so strip the chrome.
 .civicfix-marker {

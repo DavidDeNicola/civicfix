@@ -72,6 +72,22 @@
 
     <div class="location-map" #detailMap></div>
 
+    @if (puoModificare) {
+      <div class="azioni-autore">
+        <a mat-stroked-button [routerLink]="['/reports', report.id, 'edit']">
+          <mat-icon aria-hidden="true">edit</mat-icon>
+          Modifica
+        </a>
+        <button mat-stroked-button class="btn-elimina"
+                [disabled]="eliminazioneInCorso"
+                (click)="elimina()">
+          <mat-icon aria-hidden="true">delete</mat-icon>
+          {{ eliminazioneInCorso ? 'Eliminazione...' : 'Elimina' }}
+        </button>
+        <span class="nota-azioni">Possibile finché la segnalazione è in attesa</span>
+      </div>
+    }
+
   </div>
 
   <div class="updates-card">

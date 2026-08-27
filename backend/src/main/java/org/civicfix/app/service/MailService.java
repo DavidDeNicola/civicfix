@@ -3,6 +3,9 @@ package org.civicfix.app.service;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.civicfix.app.model.Report;
+import org.civicfix.app.model.ReportStatus;
+import org.civicfix.app.model.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -10,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +29,9 @@ public class MailService {
 
     @Value("${app.mail.from:}")
     private String mittente;
+
+    @Value("${app.frontend-url}")
+    private String frontendUrl;
 
     /**
      * Verifica all'avvio se l'invio email è attivo e, quando non lo è, spiega
@@ -65,19 +72,55 @@ public class MailService {
         }
     }
 
-    public void inviaLinkReset(String destinatario, String nomeCompleto, String link, int validitaMinuti) {
-        if (!StringUtils.hasText(mailUsername)) {
-            log.warn("SMTP non attivo: nessuna email inviata. "
-                    + "Usa il link di recupero stampato qui sopra. "
-                    + "Il motivo è indicato nei messaggi emessi all'avvio dell'applicazione.");
+    private static final Map<ReportStatus, String> ETICHETTE_STATO = Map.of(
+            ReportStatus.PENDING, "In attesa",
+            ReportStatus.IN_PROGRESS, "In corso",
+            ReportStatus.RESOLVED, "Risolta",
+            ReportStatus.REJECTED, "Respinta"
+    );
+
+    /**
+     * Avvisa chi ha aperto la segnalazione che lo stato è cambiato. Come per il
+     * recupero password, un problema di invio non deve far fallire l'operazione
+     * che l'ha innescata: il cambio di stato è già stato salvato.
+     */
+    public void inviaCambioStato(Report report, ReportStatus vecchio, ReportStatus nuovo, String messaggio) {
+        User destinatario = report.getReporter();
+        if (destinatario == null || !StringUtils.hasText(destinatario.getEmail())) {
             return;
         }
 
-        SimpleMailMessage messaggio = new SimpleMailMessage();
-        messaggio.setFrom(StringUtils.hasText(mittente) ? mittente : mailUsername);
-        messaggio.setTo(destinatario);
-        messaggio.setSubject("CivicFix - Recupero password");
-        messaggio.setText("""
+        String corpo = """
+                Ciao %s,
+
+                la tua segnalazione "%s" è passata da "%s" a "%s".
+                """.formatted(
+                        destinatario.getFullName(),
+                        report.getTitle(),
+                        etichetta(vecchio),
+                        etichetta(nuovo));
+
+        if (StringUtils.hasText(messaggio)) {
+            corpo += "\nNota di chi l'ha aggiornata:\n%s\n".formatted(messaggio);
+        }
+
+        corpo += """
+
+                Puoi vedere la cronologia completa qui:
+                %s/reports/%d
+
+                — CivicFix
+                """.formatted(frontendUrl, report.getId());
+
+        invia(destinatario.getEmail(), "CivicFix - Aggiornamento della tua segnalazione", corpo);
+    }
+
+    private String etichetta(ReportStatus stato) {
+        return stato == null ? "—" : ETICHETTE_STATO.getOrDefault(stato, stato.name());
+    }
+
+    public void inviaLinkReset(String destinatario, String nomeCompleto, String link, int validitaMinuti) {
+        String corpo = """
                 Ciao %s,
 
                 abbiamo ricevuto una richiesta di reimpostazione della password del tuo account CivicFix.
@@ -91,16 +134,35 @@ public class MailService {
                 la tua password attuale resta valida.
 
                 — CivicFix
-                """.formatted(nomeCompleto, link, validitaMinuti));
+                """.formatted(nomeCompleto, link, validitaMinuti);
+
+        invia(destinatario, "CivicFix - Recupero password", corpo);
+    }
+
+    /**
+     * Punto unico di invio. Un errore SMTP viene registrato ma non propagato:
+     * l'operazione che ha innescato l'email è già stata completata e non deve
+     * fallire perché il server di posta è irraggiungibile.
+     */
+    private void invia(String destinatario, String oggetto, String corpo) {
+        if (!StringUtils.hasText(mailUsername)) {
+            log.warn("SMTP non attivo: email \"{}\" non inviata a {}. "
+                    + "Il motivo è indicato nei messaggi emessi all'avvio dell'applicazione.",
+                    oggetto, destinatario);
+            return;
+        }
+
+        SimpleMailMessage messaggio = new SimpleMailMessage();
+        messaggio.setFrom(StringUtils.hasText(mittente) ? mittente : mailUsername);
+        messaggio.setTo(destinatario);
+        messaggio.setSubject(oggetto);
+        messaggio.setText(corpo);
 
         try {
             mailSender.send(messaggio);
-            log.info("Email di recupero password inviata a {}", destinatario);
+            log.info("Email \"{}\" inviata a {}", oggetto, destinatario);
         } catch (Exception ex) {
-            // L'invio non deve far fallire la richiesta HTTP: il token è già
-            // stato salvato e il link è nei log, quindi il recupero resta
-            // possibile anche se l'SMTP è irraggiungibile.
-            log.error("Invio dell'email di recupero a {} non riuscito: {}", destinatario, ex.getMessage());
+            log.error("Invio dell'email \"{}\" a {} non riuscito: {}", oggetto, destinatario, ex.getMessage());
         }
     }
 }

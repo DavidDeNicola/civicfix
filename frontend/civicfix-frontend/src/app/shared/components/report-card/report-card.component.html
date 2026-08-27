@@ -41,6 +41,24 @@
         <dt>Data</dt>
         <dd>{{ report.createdAt | date:'dd/MM/yyyy' }}</dd>
       </div>
+      <div>
+        <dt>Sostegni</dt>
+        <dd>
+          <!-- La card è cliccabile: senza stopPropagation il voto aprirebbe
+               anche il dettaglio. -->
+          <button type="button" class="voto"
+                  [class.votata]="report.votedByCurrentUser"
+                  [disabled]="!puoVotare || votoInCorso"
+                  [attr.aria-pressed]="report.votedByCurrentUser"
+                  [attr.title]="titoloVoto"
+                  (click)="$event.stopPropagation(); alternaVoto()"
+                  (keydown.enter)="$event.stopPropagation()"
+                  (keydown.space)="$event.stopPropagation()">
+            <mat-icon aria-hidden="true">{{ report.votedByCurrentUser ? 'favorite' : 'favorite_border' }}</mat-icon>
+            <span>{{ report.voteCount }}</span>
+          </button>
+        </dd>
+      </div>
     </dl>
   </div>
 

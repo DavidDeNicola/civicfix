@@ -51,6 +51,13 @@ export const routes: Routes = [
     loadComponent: () => import('./features/reports/create-report/create-report.component').then(m => m.CreateReportComponent)
   },
   {
+    // Prima di 'reports/:id', altrimenti "new" verrebbe letto come un id.
+    path: 'reports/:id/edit',
+    title: 'Modifica segnalazione',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/reports/create-report/create-report.component').then(m => m.CreateReportComponent)
+  },
+  {
     path: 'reports/:id',
     title: 'Dettaglio segnalazione',
     canActivate: [authGuard],

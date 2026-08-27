@@ -59,6 +59,31 @@ public class FileStorageService {
         return filename;
     }
 
+    /**
+     * Rimuove un file caricato. Un errore non viene propagato: la cancellazione
+     * della segnalazione a cui il file apparteneva è già avvenuta, e lasciare
+     * un file orfano è meno grave che far fallire l'operazione a metà.
+     *
+     * <p>Il nome viene ridotto al solo ultimo segmento e si verifica che il
+     * percorso risolto resti dentro la cartella di upload: un valore come
+     * "../../qualcosa" non deve poter uscire da lì.
+     */
+    public void delete(String filename) {
+        if (filename == null || filename.isBlank()) {
+            return;
+        }
+
+        try {
+            Path target = storageLocation.resolve(Paths.get(filename).getFileName()).normalize();
+            if (!target.startsWith(storageLocation)) {
+                return;
+            }
+            Files.deleteIfExists(target);
+        } catch (IOException e) {
+            // Nessuna propagazione: si veda il commento sopra.
+        }
+    }
+
     private String getExtension(String originalFilename){
         if (originalFilename == null || !originalFilename.contains(".")) {
             return "";

@@ -12,10 +12,17 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.civicfix.app.model.ReportPriority;
 
+import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +34,8 @@ public class ReportService {
     private final UpdateRepository updateRepository;
     private final FileStorageService fileStorageService;
     private final ReportPhotoRepository reportPhotoRepository;
+    private final VoteRepository voteRepository;
+    private final MailService mailService;
 
     public ReportResponse createReport(CreateReportRequest request, Long reporterId) {
         User reporter = userRepository.findById(reporterId)
@@ -45,32 +54,108 @@ public class ReportService {
         return ReportResponse.from(reportRepository.save(report));
     }
 
-    public ReportResponse getById(Long id) {
+    public ReportResponse getById(Long id, Long currentUserId) {
         Report report = reportRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Segnalazione non trovata"));
-        return ReportResponse.from(report);
+
+        long voti = voteRepository.countByReportId(id);
+        boolean votata = currentUserId != null && voteRepository.existsByReportIdAndUserId(id, currentUserId);
+
+        return ReportResponse.from(report, voti, votata);
     }
 
     public PagedResponse<ReportResponse> searchReports(
-            ReportCategory category,
-            ReportStatus status,
+            List<ReportCategory> categories,
+            List<ReportStatus> statuses,
+            String titolo,
+            LocalDate da,
+            LocalDate a,
             Double lat,
             Double lng,
             Double radiusKm,
             int page,
-            int size) {
+            int size,
+            Long currentUserId) {
 
         Specification<Report> spec = Specification
-                .where(ReportSpecifications.hasCategory(category))
-                .and(ReportSpecifications.hasStatus(status))
+                .where(ReportSpecifications.hasCategoryIn(categories))
+                .and(ReportSpecifications.hasStatusIn(statuses))
+                .and(ReportSpecifications.titleContains(titolo))
+                .and(ReportSpecifications.createdBetween(da, a))
                 .and(ReportSpecifications.nearLocation(lat, lng, radiusKm));
 
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
 
-        Page<ReportResponse> result = reportRepository.findAll(spec, pageable)
-                .map(ReportResponse::from);
+        Page<Report> pagina = reportRepository.findAll(spec, pageable);
+        List<Long> ids = pagina.getContent().stream().map(Report::getId).toList();
+
+        // Due query per l'intera pagina invece di due per riga.
+        Map<Long, Long> conteggi = ids.isEmpty() ? Map.of()
+                : voteRepository.contaPerSegnalazioni(ids).stream()
+                        .collect(Collectors.toMap(r -> (Long) r[0], r -> (Long) r[1]));
+
+        Set<Long> votate = (currentUserId == null || ids.isEmpty()) ? Set.of()
+                : new HashSet<>(voteRepository.segnalazioniVotateDa(currentUserId, ids));
+
+        Page<ReportResponse> result = pagina.map(report -> ReportResponse.from(
+                report,
+                conteggi.getOrDefault(report.getId(), 0L),
+                votate.contains(report.getId())));
 
         return PagedResponse.from(result);
+    }
+
+    /**
+     * Modifica una segnalazione. È concesso solo a chi l'ha aperta e solo
+     * finché è in attesa: appena viene presa in carico, team e operatore
+     * stanno già lavorando su quanto descritto, e cambiarlo sotto di loro
+     * renderebbe incoerente la cronologia.
+     */
+    @Transactional
+    public ReportResponse updateReport(Long reportId, CreateReportRequest request, Long currentUserId) {
+        Report report = caricaModificabile(reportId, currentUserId);
+
+        report.setTitle(request.title());
+        report.setDescription(request.description());
+        report.setCategory(request.category());
+        report.setLatitude(request.latitude());
+        report.setLongitude(request.longitude());
+        report.setAddress(request.address());
+
+        Report salvata = reportRepository.save(report);
+        return ReportResponse.from(salvata, voteRepository.countByReportId(reportId), false);
+    }
+
+    @Transactional
+    public void deleteReport(Long reportId, Long currentUserId) {
+        Report report = caricaModificabile(reportId, currentUserId);
+
+        // I voti non sono mappati come figli della segnalazione: senza questa
+        // rimozione resterebbero righe orfane e il vincolo di chiave esterna
+        // farebbe fallire la cancellazione.
+        voteRepository.deleteByReportId(reportId);
+
+        // Le foto sono in cascata sul database, ma i file no.
+        for (ReportPhoto foto : reportPhotoRepository.findByReportId(reportId)) {
+            fileStorageService.delete(foto.getFilePath());
+        }
+
+        reportRepository.delete(report);
+    }
+
+    private Report caricaModificabile(Long reportId, Long currentUserId) {
+        Report report = reportRepository.findById(reportId)
+                .orElseThrow(() -> new IllegalArgumentException("Segnalazione non trovata"));
+
+        if (!report.getReporter().getId().equals(currentUserId)) {
+            throw new AccessDeniedException("Puoi intervenire solo sulle tue segnalazioni");
+        }
+        if (report.getStatus() != ReportStatus.PENDING) {
+            throw new IllegalArgumentException(
+                    "La segnalazione è già stata presa in carico e non può più essere modificata o eliminata");
+        }
+
+        return report;
     }
 
     public ReportResponse assignTeam(Long reportId, Long teamId) {
@@ -133,6 +218,10 @@ public class ReportService {
         update.setOldStatus(oldStatus);
         update.setNewStatus(newStatus);
         updateRepository.save(update);
+
+        // Avvisa chi ha segnalato: è l'unico modo che ha di sapere che
+        // qualcosa si è mosso senza tornare a controllare da solo.
+        mailService.inviaCambioStato(report, oldStatus, newStatus, message);
 
         return ReportResponse.from(report);
     }

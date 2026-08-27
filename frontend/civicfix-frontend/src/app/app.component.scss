@@ -33,7 +33,11 @@
   background-color: var(--color-surface);
   border-right: 1px solid var(--color-border) !important;
   box-shadow: 2px 0 16px rgba(15, 23, 42, 0.06);
-  z-index: 2;
+  // Deve superare sia lo sfondo scuro del drawer mobile (.mat-drawer-backdrop,
+  // z-index 3 di Material) sia la mobile-topbar (z-index 5): con z-index:2 il
+  // drawer restava visivamente aperto ma il backdrop intercettava ogni click,
+  // rendendo i link della sidebar completamente non cliccabili su mobile.
+  z-index: 6;
 }
 
 // Da desktop la sidenav occupa solo la larghezza della barra a icone: il

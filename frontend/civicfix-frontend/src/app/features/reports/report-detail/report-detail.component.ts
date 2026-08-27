@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatButtonModule } from '@angular/material/button';
@@ -9,6 +9,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ReportService } from '../../../core/services/report.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { Report, ReportPhoto, ReportStatus, Update } from '../../../core/models/report.model';
@@ -16,6 +17,7 @@ import { Role } from '../../../core/models/user.model';
 import { ICONE_CATEGORIA } from '../../../core/constants/category-icons';
 import { segnapostoPerCategoria } from '../../../core/constants/map-marker';
 import { CategoriaPipe, PrioritaPipe, StatoPipe } from '../../../core/pipes/etichette.pipe';
+import { ConfermaDialogComponent } from '../../../shared/components/conferma-dialog/conferma-dialog.component';
 import { Component, ElementRef, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import * as L from 'leaflet';
 
@@ -27,7 +29,7 @@ const PHOTO_BASE_URL = 'http://localhost:8080';
   imports: [
     CommonModule, FormsModule, MatCardModule, MatChipsModule, MatButtonModule,
     MatFormFieldModule, MatInputModule, MatSelectModule, MatProgressSpinnerModule, MatIconModule,
-    StatoPipe, PrioritaPipe, CategoriaPipe
+    MatDialogModule, RouterLink, StatoPipe, PrioritaPipe, CategoriaPipe
   ],
   templateUrl: './report-detail.component.html',
   styleUrl: './report-detail.component.scss'
@@ -63,13 +65,16 @@ export class ReportDetailComponent implements OnInit, OnDestroy {
   nuovoCommento: string = '';
   nuovoStato: ReportStatus | null = null;
   salvataggioInCorso: boolean = false;
+  eliminazioneInCorso: boolean = false;
 
   statiDisponibili = Object.values(ReportStatus);
   photoBaseUrl = PHOTO_BASE_URL;
 
   constructor(
     private route: ActivatedRoute,
+    private router: Router,
     private reportService: ReportService,
+    private dialog: MatDialog,
     public authService: AuthService
   ) {}
 
@@ -116,6 +121,45 @@ export class ReportDetailComponent implements OnInit, OnDestroy {
   get puoGestireStato(): boolean {
     const role = this.authService.role;
     return role === Role.OPERATOR || role === Role.ADMIN;
+  }
+
+  /**
+   * Modifica ed eliminazione restano possibili solo a chi ha aperto la
+   * segnalazione e solo finché nessuno l'ha presa in carico. Il backend
+   * applica le stesse condizioni: qui si evita di mostrare pulsanti che
+   * verrebbero rifiutati.
+   */
+  get puoModificare(): boolean {
+    return !!this.report
+      && this.report.status === ReportStatus.PENDING
+      && this.authService.username === this.report.reportedUsername;
+  }
+
+  elimina(): void {
+    if (!this.report) return;
+
+    const ref = this.dialog.open(ConfermaDialogComponent, {
+      data: {
+        titolo: 'Eliminare la segnalazione?',
+        messaggio: `"${this.report.title}" verrà rimossa definitivamente, insieme alle sue foto. L'operazione non è reversibile.`,
+        conferma: 'Elimina',
+        pericolosa: true
+      },
+      restoreFocus: true
+    });
+
+    ref.afterClosed().subscribe((confermato: boolean | undefined) => {
+      if (!confermato || !this.report) return;
+
+      this.eliminazioneInCorso = true;
+      this.reportService.delete(this.report.id).subscribe({
+        next: () => this.router.navigate(['/reports']),
+        error: (err) => {
+          this.eliminazioneInCorso = false;
+          this.errore = err.error?.message ?? 'Impossibile eliminare la segnalazione.';
+        }
+      });
+    });
   }
 
   caricaDati(id: number): void {

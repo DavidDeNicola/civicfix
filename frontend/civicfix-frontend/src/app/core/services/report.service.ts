@@ -5,11 +5,13 @@ import {
   CreateReportRequest,
   PagedResponse,
   Report,
+  ReportCategory,
   ReportPhoto,
   ReportPriority,
   ReportStatus,
   Update,
-  AssignPriorityRequest
+  AssignPriorityRequest,
+  VoteResponse
 } from '../models/report.model';
 
 const API_URL = 'http://localhost:8080/api/reports';
@@ -29,8 +31,69 @@ export class ReportService {
     return this.http.get<PagedResponse<Report>>(API_URL, { params });
   }
 
+  /**
+   * Ricerca lato server. Il filtro per vicinanza va fatto qui e non nel
+   * browser: filtrare dopo aver scaricato una pagina restituirebbe meno
+   * risultati del dovuto, perché la selezione avverrebbe su un sottoinsieme
+   * già tagliato dalla paginazione.
+   */
+  search(opzioni: {
+    page?: number;
+    size?: number;
+    categories?: ReportCategory[];
+    statuses?: ReportStatus[];
+    title?: string;
+    from?: string;
+    to?: string;
+    lat?: number;
+    lng?: number;
+    radiusKm?: number;
+  } = {}): Observable<PagedResponse<Report>> {
+    let params = new HttpParams()
+      .set('page', opzioni.page ?? 0)
+      .set('size', opzioni.size ?? 10);
+
+    // Un elenco vuoto non va inviato: il backend lo interpreta come
+    // "nessun vincolo", ma un parametro vuoto genererebbe un valore spurio.
+    for (const categoria of opzioni.categories ?? []) {
+      params = params.append('categories', categoria);
+    }
+    for (const stato of opzioni.statuses ?? []) {
+      params = params.append('statuses', stato);
+    }
+    if (opzioni.title?.trim()) params = params.set('title', opzioni.title.trim());
+    if (opzioni.from) params = params.set('from', opzioni.from);
+    if (opzioni.to) params = params.set('to', opzioni.to);
+
+    if (opzioni.lat != null && opzioni.lng != null && opzioni.radiusKm != null) {
+      params = params
+        .set('lat', opzioni.lat)
+        .set('lng', opzioni.lng)
+        .set('radiusKm', opzioni.radiusKm);
+    }
+
+    return this.http.get<PagedResponse<Report>>(API_URL, { params });
+  }
+
+  update(id: number, dto: CreateReportRequest): Observable<Report> {
+    return this.http.put<Report>(`${API_URL}/${id}`, dto);
+  }
+
+  delete(id: number): Observable<void> {
+    return this.http.delete<void>(`${API_URL}/${id}`);
+  }
+
   findById(id: number): Observable<Report> {
     return this.http.get<Report>(`${API_URL}/${id}`);
+  }
+
+  /** Sostiene una segnalazione altrui; restituisce il conteggio aggiornato. */
+  vota(reportId: number): Observable<VoteResponse> {
+    return this.http.post<VoteResponse>(`${API_URL}/${reportId}/vote`, {});
+  }
+
+  annullaVoto(reportId: number): Observable<VoteResponse> {
+    return this.http.delete<VoteResponse>(`${API_URL}/${reportId}/vote`);
   }
 
   getPhotos(id: number): Observable<ReportPhoto[]> {

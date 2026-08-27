@@ -3,8 +3,10 @@
   <aside class="filters-sidebar">
     <h3>Filtri</h3>
 
-    <label class="filter-label">Cerca per titolo</label>
-    <input type="text" class="filter-input" [(ngModel)]="ricerca" placeholder="Es. buca, lampione...">
+    <label class="filter-label" for="cerca">Cerca per titolo</label>
+    <input id="cerca" type="text" class="filter-input"
+           [ngModel]="ricerca" (ngModelChange)="onRicercaDigitata($event)"
+           placeholder="Es. buca, lampione...">
 
     <label class="filter-label">Stato</label>
     <div class="checkbox-group">
@@ -26,9 +28,41 @@
 
     <label class="filter-label">Data di aggiunta</label>
     <div class="date-range">
-      <input type="date" class="filter-input" [(ngModel)]="dataDa">
+      <input type="date" class="filter-input" [(ngModel)]="dataDa" (ngModelChange)="filtriCambiati()">
       <span>–</span>
-      <input type="date" class="filter-input" [(ngModel)]="dataA">
+      <input type="date" class="filter-input" [(ngModel)]="dataA" (ngModelChange)="filtriCambiati()">
+    </div>
+
+    <label class="filter-label" id="etichetta-vicinanza">Vicino a me</label>
+    <div class="vicinanza" role="group" aria-labelledby="etichetta-vicinanza">
+      @if (!posizione) {
+        <button type="button" class="btn-posizione"
+                [disabled]="posizioneInCorso"
+                (click)="usaLaMiaPosizione()">
+          <mat-icon aria-hidden="true">my_location</mat-icon>
+          {{ posizioneInCorso ? 'Rilevamento...' : 'Usa la mia posizione' }}
+        </button>
+      } @else {
+        <p class="posizione-attiva">
+          <mat-icon aria-hidden="true" class="mini">check_circle</mat-icon>
+          Posizione rilevata
+        </p>
+
+        <label class="sotto-etichetta" for="raggio">Raggio</label>
+        <select id="raggio" class="filter-input" [(ngModel)]="raggioKm" (ngModelChange)="cambiaRaggio()">
+          @for (raggio of raggiDisponibili; track raggio) {
+            <option [ngValue]="raggio">Entro {{ raggio }} km</option>
+          }
+        </select>
+
+        <button type="button" class="btn-testo" (click)="azzeraPosizione()">
+          Mostra tutte le segnalazioni
+        </button>
+      }
+
+      @if (errorePosizione) {
+        <p class="errore-posizione" role="alert">{{ errorePosizione }}</p>
+      }
     </div>
   </aside>
 
@@ -40,49 +74,53 @@
       }
     </div>
 
+    <div class="selettore-vista" role="group" aria-label="Modo di visualizzazione">
+      <button type="button" [class.attiva]="vista === 'elenco'"
+              [attr.aria-pressed]="vista === 'elenco'"
+              (click)="cambiaVista('elenco')">
+        <mat-icon aria-hidden="true">view_list</mat-icon> Elenco
+      </button>
+      <button type="button" [class.attiva]="vista === 'mappa'"
+              [attr.aria-pressed]="vista === 'mappa'"
+              (click)="cambiaVista('mappa')">
+        <mat-icon aria-hidden="true">map</mat-icon> Mappa
+      </button>
+    </div>
+
     @if (loading) {
       <div class="spinner-container"><mat-spinner></mat-spinner></div>
     } @else if (errore) {
       <p class="error-message">{{ errore }}</p>
-    } @else if (isAdmin) {
+    } @else {
 
-      @if (tutteFiltrate.length === 0) {
+      @if (reports.length === 0) {
         <p class="empty-hint">Nessuna segnalazione corrisponde ai filtri.</p>
-      } @else {
+      }
+
+      @if (vista === 'mappa') {
+        <app-reports-map class="mappa-insieme"
+                         [reports]="reports"
+                         [centro]="posizione"
+                         [raggioKm]="posizione ? raggioKm : null"></app-reports-map>
+        <p class="nota-mappa">
+          La mappa mostra le {{ reports.length }} segnalazioni di questa pagina, su {{ totaleElementi }} totali.
+        </p>
+      } @else if (reports.length > 0) {
         <div class="reports-list-col">
-          @for (report of tutteFiltrate; track report.id) {
+          @for (report of reports; track report.id) {
             <app-report-card [report]="report"></app-report-card>
           }
         </div>
       }
 
-    } @else {
-
-      <section class="status-section">
-        <h2 class="section-title">In corso</h2>
-        @if (inCorso.length === 0) {
-          <p class="empty-hint">Nessuna segnalazione in corso.</p>
-        } @else {
-          <div class="reports-list-col">
-            @for (report of inCorso; track report.id) {
-              <app-report-card [report]="report"></app-report-card>
-            }
-          </div>
-        }
-      </section>
-
-      <section class="status-section">
-        <h2 class="section-title">In attesa</h2>
-        @if (inAttesa.length === 0) {
-          <p class="empty-hint">Nessuna segnalazione in attesa.</p>
-        } @else {
-          <div class="reports-list-col">
-            @for (report of inAttesa; track report.id) {
-              <app-report-card [report]="report"></app-report-card>
-            }
-          </div>
-        }
-      </section>
+      <mat-paginator
+        [length]="totaleElementi"
+        [pageIndex]="pagina"
+        [pageSize]="dimensionePagina"
+        [pageSizeOptions]="dimensioniPagina"
+        (page)="cambiaPagina($event)"
+        aria-label="Naviga tra le pagine delle segnalazioni">
+      </mat-paginator>
 
     }
   </div>
