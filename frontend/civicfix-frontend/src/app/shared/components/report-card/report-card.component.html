@@ -1,12 +1,21 @@
-<div class="report-card" [ngClass]="'accent-' + report.category.toLowerCase()" [routerLink]="['/reports', report.id]">
-  <div class="category-icon" [ngClass]="'cat-' + report.category.toLowerCase()">{{ icona }}</div>
+<div class="report-card"
+     [ngClass]="'accent-' + report.category.toLowerCase()"
+     [routerLink]="['/reports', report.id]"
+     role="link"
+     tabindex="0"
+     [attr.aria-label]="report.title + ', ' + report.address"
+     (keydown.enter)="open()"
+     (keydown.space)="$event.preventDefault(); open()">
+  <div class="category-icon" [ngClass]="'cat-' + report.category.toLowerCase()">
+    <mat-icon aria-hidden="true">{{ icona }}</mat-icon>
+  </div>
 
   <div class="card-main">
     <div class="card-title-row">
       <h3>{{ report.title }}</h3>
       <span class="priority-badge" [ngClass]="'priority-' + report.priority.toLowerCase()">{{ report.priority }}</span>
     </div>
-    <span class="address">📍 {{ report.address }}</span>
+    <span class="address"><mat-icon aria-hidden="true" class="inline-icon">place</mat-icon> {{ report.address }}</span>
     <p class="description">{{ report.description }}</p>
     <div class="card-footer">
       <span class="status-badge" [ngClass]="'status-' + report.status.toLowerCase()">{{ report.status }}</span>

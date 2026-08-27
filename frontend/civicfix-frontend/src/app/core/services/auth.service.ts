@@ -36,6 +36,19 @@ export class AuthService {
     );
   }
 
+  /**
+   * Avvia il recupero password. Il backend risponde allo stesso modo sia che
+   * l'email esista sia che non esista, quindi la UI non può (e non deve)
+   * distinguere i due casi.
+   */
+  forgotPassword(email: string): Observable<void> {
+    return this.http.post<void>(`${API_URL}/forgot-password`, { email });
+  }
+
+  resetPassword(token: string, newPassword: string): Observable<void> {
+    return this.http.post<void>(`${API_URL}/reset-password`, { token, newPassword });
+  }
+
   logout(): void {
     localStorage.removeItem(TOKEN_KEY);
     this.username = null;

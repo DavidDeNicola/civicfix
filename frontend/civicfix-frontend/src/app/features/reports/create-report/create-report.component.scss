@@ -1,7 +1,14 @@
 .create-card { max-width: 700px; margin: 16px auto; }
 .full-width { width: 100%; margin-bottom: 12px; }
-.map-hint { margin: 12px 0 4px; font-size: 0.9rem; }
-.map-container { height: 350px; width: 100%; border-radius: 4px; margin-bottom: 12px; }
-.coords { font-size: 0.9rem; color: #888; margin-bottom: 12px; }
-.file-input { margin-bottom: 16px; }
-.error-message { color: #c62828; }
+.map-hint { margin: 12px 0 4px; font-size: 0.9rem; color: var(--color-muted-foreground); }
+.map-container { height: 350px; width: 100%; border-radius: var(--radius-md); margin-bottom: 12px; }
+.coords { font-size: 0.9rem; color: var(--color-muted-foreground); margin-bottom: 12px; }
+.file-input {
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.9rem;
+}
+.file-input label { font-weight: 600; color: var(--color-foreground); }
+.error-message { color: var(--color-destructive); }

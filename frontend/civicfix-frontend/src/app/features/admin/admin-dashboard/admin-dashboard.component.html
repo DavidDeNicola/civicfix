@@ -10,172 +10,134 @@
     <mat-tab label="Utenti">
       <div class="tab-content">
 
-        <h3>Nuovo utente</h3>
-        <div class="form-row">
-          <mat-form-field appearance="outline">
-            <mat-label>Username</mat-label>
-            <input matInput [(ngModel)]="nuovoUtente.username">
-          </mat-form-field>
-          <mat-form-field appearance="outline">
-            <mat-label>Email</mat-label>
-            <input matInput [(ngModel)]="nuovoUtente.email">
-          </mat-form-field>
-          <mat-form-field appearance="outline">
-            <mat-label>Password</mat-label>
-            <input matInput type="password" [(ngModel)]="nuovoUtente.password">
-          </mat-form-field>
-          <mat-form-field appearance="outline">
-            <mat-label>Nome completo</mat-label>
-            <input matInput [(ngModel)]="nuovoUtente.fullName">
-          </mat-form-field>
-          <mat-form-field appearance="outline">
-            <mat-label>Ruolo</mat-label>
-            <mat-select [(ngModel)]="nuovoUtente.role">
-              @for (ruolo of ruoliDisponibili; track ruolo) {
-                <mat-option [value]="ruolo">{{ ruolo }}</mat-option>
-              }
-            </mat-select>
-          </mat-form-field>
-          @if (nuovoUtente.role === 'OPERATOR') {
-            <mat-form-field appearance="outline">
-              <mat-label>Team</mat-label>
-              <mat-select [(ngModel)]="nuovoUtente.teamId">
-                @for (team of teams; track team.id) {
-                  <mat-option [value]="team.id">{{ team.name }}</mat-option>
-                }
-              </mat-select>
-            </mat-form-field>
-          }
-          <button mat-raised-button color="primary" (click)="creaUtente()">Crea</button>
+        <div class="section-header">
+          <h3>Elenco utenti</h3>
+          <button mat-flat-button color="primary" (click)="apriDialogUtente()">
+            <mat-icon aria-hidden="true">person_add</mat-icon>
+            Crea utente
+          </button>
         </div>
-
-        <h3>Elenco utenti</h3>
-        <table class="admin-table">
-          <thead>
-          <tr><th>Username</th><th>Email</th><th>Ruolo</th><th>Team</th><th>Riassegna team</th></tr>
-          </thead>
-          <tbody>
-            @for (utente of users; track utente.id) {
-              <tr>
-                <td>{{ utente.username }}</td>
-                <td>{{ utente.email }}</td>
-                <td><span class="role-badge" [ngClass]="'role-' + utente.role.toLowerCase()">{{ utente.role }}</span></td>
-                <td>{{ utente.teamName ?? '—' }}</td>
-                <td>
-                  @if (utente.role === 'OPERATOR') {
-                    <mat-form-field appearance="outline" class="inline-select">
-                      <mat-select [(ngModel)]="utente.teamId" (selectionChange)="assegnaTeamUtente(utente.id, utente.teamId!)">
-                        @for (team of teams; track team.id) {
-                          <mat-option [value]="team.id">{{ team.name }}</mat-option>
-                        }
-                      </mat-select>
-                    </mat-form-field>
-                  }
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
+        <div class="table-scroll">
+          <table class="admin-table">
+            <thead>
+            <tr><th scope="col">Username</th><th scope="col">Email</th><th scope="col">Ruolo</th><th scope="col">Team</th><th scope="col">Riassegna team</th></tr>
+            </thead>
+            <tbody>
+              @for (utente of users; track utente.id) {
+                <tr>
+                  <td>{{ utente.username }}</td>
+                  <td>{{ utente.email }}</td>
+                  <td><span class="role-badge" [ngClass]="'role-' + utente.role.toLowerCase()">{{ utente.role }}</span></td>
+                  <td>{{ utente.teamName ?? '—' }}</td>
+                  <td>
+                    @if (utente.role === 'OPERATOR') {
+                      <mat-form-field appearance="outline" class="inline-select">
+                        <mat-select [(ngModel)]="utente.teamId" (selectionChange)="assegnaTeamUtente(utente.id, utente.teamId!)">
+                          @for (team of teams; track team.id) {
+                            <mat-option [value]="team.id">{{ team.name }}</mat-option>
+                          }
+                        </mat-select>
+                      </mat-form-field>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
       </div>
     </mat-tab>
 
     <mat-tab label="Team">
       <div class="tab-content">
 
-        <h3>Nuovo team</h3>
-        <div class="form-row">
-          <mat-form-field appearance="outline">
-            <mat-label>Nome</mat-label>
-            <input matInput [(ngModel)]="nuovoTeam.name">
-          </mat-form-field>
-          <mat-form-field appearance="outline">
-            <mat-label>Categoria</mat-label>
-            <mat-select [(ngModel)]="nuovoTeam.category">
-              @for (categoria of categorieDisponibili; track categoria) {
-                <mat-option [value]="categoria">{{ categoria }}</mat-option>
-              }
-            </mat-select>
-          </mat-form-field>
-          <button mat-raised-button color="primary" (click)="creaTeam()">Crea</button>
+        <div class="section-header">
+          <h3>Elenco team</h3>
+          <button mat-flat-button color="primary" (click)="apriDialogTeam()">
+            <mat-icon aria-hidden="true">group_add</mat-icon>
+            Crea team
+          </button>
         </div>
-
-        <h3>Elenco team</h3>
-        <table class="admin-table">
-          <thead>
-          <tr><th>Nome</th><th>Categoria</th><th>Membri</th></tr>
-          </thead>
-          <tbody>
-            @for (team of teams; track team.id) {
-              <tr>
-                <td>{{ team.name }}</td>
-                <td>{{ team.category }}</td>
-                <td>{{ team.memberCount }}</td>
-              </tr>
-            }
-          </tbody>
-        </table>
+        <div class="table-scroll">
+          <table class="admin-table">
+            <thead>
+            <tr><th scope="col">Nome</th><th scope="col">Categoria</th><th scope="col">Membri</th></tr>
+            </thead>
+            <tbody>
+              @for (team of teams; track team.id) {
+                <tr>
+                  <td>{{ team.name }}</td>
+                  <td>{{ team.category }}</td>
+                  <td>{{ team.memberCount }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
       </div>
     </mat-tab>
 
     <mat-tab label="Assegna segnalazioni">
       <div class="tab-content">
-        <table class="admin-table">
-          <thead>
-          <tr><th>Titolo</th><th>Stato</th><th>Team assegnato</th><th>Assegna team</th><th>Operatore assegnato</th><th>Assegna operatore</th><th>Priorità</th></tr>
-          </thead>
-          <tbody>
-            @for (report of reports; track report.id) {
-              <tr>
-                <td>{{ report.title }}</td>
-                <td><span class="status-badge" [ngClass]="'status-' + report.status.toLowerCase()">{{ report.status }}</span></td>
-                <td>{{ report.assignedTeamName ?? '—' }}</td>
-                <td>
-                  @if (puoEssereAssegnata(report)) {
-                    <mat-form-field appearance="outline" class="inline-select">
-                      <mat-select [(ngModel)]="teamSceltoPerReport[report.id]">
-                        @for (team of teams; track team.id) {
-                          <mat-option [value]="team.id">{{ team.name }}</mat-option>
-                        }
-                      </mat-select>
-                    </mat-form-field>
-                    <button mat-button (click)="assegnaTeamReport(report)">Assegna</button>
-                  } @else {
-                    <span class="closed-hint">Segnalazione chiusa</span>
-                  }
-                </td>
-                <td>{{ report.assignedOperatorUsername ?? '—' }}</td>
-                <td>
-                  @if (puoEssereAssegnata(report)) {
-                    <mat-form-field appearance="outline" class="inline-select">
-                      <mat-select [(ngModel)]="operatoreSceltoPerReport[report.id]">
-                        @for (operatore of operatori; track operatore.id) {
-                          <mat-option [value]="operatore.id">{{ operatore.username }}</mat-option>
-                        }
-                      </mat-select>
-                    </mat-form-field>
-                    <button mat-button (click)="assegnaOperatoreReport(report)">Assegna</button>
-                  } @else {
-                    <span class="closed-hint">—</span>
-                  }
-                </td>
-                <td>
-                  @if (puoEssereAssegnata(report)) {
-                    <mat-form-field appearance="outline" class="inline-select">
-                      <mat-select [(ngModel)]="prioritaSceltaPerReport[report.id]">
-                        @for (p of prioritaDisponibili; track p) {
-                          <mat-option [value]="p">{{ p }}</mat-option>
-                        }
-                      </mat-select>
-                    </mat-form-field>
-                    <button mat-button (click)="assegnaPriorita(report)">Assegna</button>
-                  } @else {
-                    <span class="priority-badge" [ngClass]="'priority-' + report.priority.toLowerCase()">{{ report.priority }}</span>
-                  }
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
+        <div class="table-scroll">
+          <table class="admin-table">
+            <thead>
+            <tr><th scope="col">Titolo</th><th scope="col">Stato</th><th scope="col">Team assegnato</th><th scope="col">Assegna team</th><th scope="col">Operatore assegnato</th><th scope="col">Assegna operatore</th><th scope="col">Priorità</th></tr>
+            </thead>
+            <tbody>
+              @for (report of reports; track report.id) {
+                <tr>
+                  <td>{{ report.title }}</td>
+                  <td><span class="status-badge" [ngClass]="'status-' + report.status.toLowerCase()">{{ report.status }}</span></td>
+                  <td>{{ report.assignedTeamName ?? '—' }}</td>
+                  <td>
+                    @if (puoEssereAssegnata(report)) {
+                      <mat-form-field appearance="outline" class="inline-select">
+                        <mat-select [(ngModel)]="teamSceltoPerReport[report.id]">
+                          @for (team of teams; track team.id) {
+                            <mat-option [value]="team.id">{{ team.name }}</mat-option>
+                          }
+                        </mat-select>
+                      </mat-form-field>
+                      <button mat-button (click)="assegnaTeamReport(report)">Assegna</button>
+                    } @else {
+                      <span class="closed-hint">Segnalazione chiusa</span>
+                    }
+                  </td>
+                  <td>{{ report.assignedOperatorUsername ?? '—' }}</td>
+                  <td>
+                    @if (puoEssereAssegnata(report)) {
+                      <mat-form-field appearance="outline" class="inline-select">
+                        <mat-select [(ngModel)]="operatoreSceltoPerReport[report.id]">
+                          @for (operatore of operatori; track operatore.id) {
+                            <mat-option [value]="operatore.id">{{ operatore.username }}</mat-option>
+                          }
+                        </mat-select>
+                      </mat-form-field>
+                      <button mat-button (click)="assegnaOperatoreReport(report)">Assegna</button>
+                    } @else {
+                      <span class="closed-hint">—</span>
+                    }
+                  </td>
+                  <td>
+                    @if (puoEssereAssegnata(report)) {
+                      <mat-form-field appearance="outline" class="inline-select">
+                        <mat-select [(ngModel)]="prioritaSceltaPerReport[report.id]">
+                          @for (p of prioritaDisponibili; track p) {
+                            <mat-option [value]="p">{{ p }}</mat-option>
+                          }
+                        </mat-select>
+                      </mat-form-field>
+                      <button mat-button (click)="assegnaPriorita(report)">Assegna</button>
+                    } @else {
+                      <span class="priority-badge" [ngClass]="'priority-' + report.priority.toLowerCase()">{{ report.priority }}</span>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
       </div>
     </mat-tab>
 

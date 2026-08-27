@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatIconModule } from '@angular/material/icon';
 import { ReportService } from '../../../core/services/report.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { Report, ReportCategory, ReportStatus } from '../../../core/models/report.model';
@@ -13,7 +14,7 @@ import { ReportCardComponent } from '../../../shared/components/report-card/repo
 @Component({
   selector: 'app-reports-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, MatProgressSpinnerModule, MatCheckboxModule, ReportCardComponent],
+  imports: [CommonModule, FormsModule, RouterLink, MatProgressSpinnerModule, MatCheckboxModule, MatIconModule, ReportCardComponent],
   templateUrl: './reports-list.component.html',
   styleUrl: './reports-list.component.scss'
 })

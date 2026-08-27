@@ -1,20 +1,46 @@
+.mobile-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background-color: var(--color-surface) !important;
+  color: var(--color-foreground) !important;
+  border-bottom: 1px solid var(--color-border);
+  height: 56px;
+  gap: 8px;
+}
+.mobile-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: inherit;
+}
+.mobile-brand-icon { color: var(--color-accent); }
+.mobile-brand-name {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
 .app-shell {
-  height: 100vh;
+  height: calc(100vh - var(--footer-height));
+}
+.app-shell-mobile {
+  height: calc(100vh - var(--footer-height) - 56px);
 }
 .sidebar {
   width: 240px;
-  background-color: #ffffff;
-  border-right: none !important;
-  box-shadow: 2px 0 16px rgba(0, 0, 0, 0.08);
+  background-color: var(--color-surface);
+  border-right: 1px solid var(--color-border) !important;
+  box-shadow: 2px 0 16px rgba(15, 23, 42, 0.06);
   z-index: 2;
 }
 .content-area {
-  padding: 32px;
+  padding: var(--space-xl);
   box-sizing: border-box;
-  background-color: #f0f0f5;
+  background-color: transparent;
 }
 
-:host-context(.dark-theme) {
-  .sidebar { background-color: #1e1e1e; }
-  .content-area { background-color: #121212; }
+@media (max-width: 768px) {
+  .content-area { padding: var(--space-md); }
 }

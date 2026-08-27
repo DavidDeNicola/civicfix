@@ -6,7 +6,9 @@
 
   <div class="detail-card" [ngClass]="'accent-' + report.category.toLowerCase()">
     <div class="detail-header">
-      <div class="category-icon" [ngClass]="'cat-' + report.category.toLowerCase()">{{ iconaCategoria }}</div>
+      <div class="category-icon" [ngClass]="'cat-' + report.category.toLowerCase()">
+        <mat-icon aria-hidden="true">{{ iconaCategoria }}</mat-icon>
+      </div>
       <div>
         <h1>{{ report.title }}</h1>
         <span class="address">{{ report.address }}</span>

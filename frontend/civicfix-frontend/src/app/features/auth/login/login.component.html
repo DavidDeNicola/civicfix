@@ -20,6 +20,10 @@
         <input matInput type="password" [(ngModel)]="password" (keyup.enter)="login()" autocomplete="current-password">
       </mat-form-field>
 
+      <div class="forgot-row">
+        <a routerLink="/forgot-password" class="forgot-link">Password dimenticata?</a>
+      </div>
+
       <button mat-flat-button color="primary" class="full-width"
               (click)="login()" [disabled]="loading">
         {{ loading ? 'Accesso in corso...' : 'Accedi' }}

@@ -1,0 +1,55 @@
+<div class="home-page" [class.home-page-shell]="isLoggedIn">
+
+  @if (!isLoggedIn) {
+    <header class="home-topbar">
+      <a routerLink="/" class="brand">
+        <mat-icon aria-hidden="true">location_city</mat-icon>
+        <span>CivicFix</span>
+      </a>
+      <nav class="home-nav">
+        <a routerLink="/login" class="text-link">Accedi</a>
+        <a routerLink="/register" class="cta-link">Registrati</a>
+      </nav>
+    </header>
+  }
+
+  <main class="hero">
+    <h1>Segnala un problema. Segui la soluzione.</h1>
+    <p class="lead">
+      CivicFix è il modo più semplice per i cittadini di segnalare buche, luci rotte,
+      rifiuti abbandonati e altri disagi urbani direttamente al proprio comune — e per
+      il comune di tracciarli fino alla risoluzione.
+    </p>
+
+    <div class="benefits">
+      <div class="benefit">
+        <mat-icon aria-hidden="true">add_a_photo</mat-icon>
+        <h2>Segnala in un minuto</h2>
+        <p>Titolo, foto e posizione sulla mappa: bastano pochi clic per inviare una segnalazione.</p>
+      </div>
+      <div class="benefit">
+        <mat-icon aria-hidden="true">timeline</mat-icon>
+        <h2>Segui lo stato</h2>
+        <p>Ogni segnalazione ha una cronologia pubblica: sai sempre a che punto è.</p>
+      </div>
+      <div class="benefit">
+        <mat-icon aria-hidden="true">groups</mat-icon>
+        <h2>Il comune risponde</h2>
+        <p>Le squadre operative ricevono, assegnano e risolvono le segnalazioni della zona.</p>
+      </div>
+    </div>
+
+    @if (isLoggedIn) {
+      <a routerLink="/reports" class="cta-button">
+        Vai alle segnalazioni
+        <mat-icon aria-hidden="true">arrow_forward</mat-icon>
+      </a>
+    } @else {
+      <a routerLink="/register" class="cta-button">
+        Inizia a segnalare
+        <mat-icon aria-hidden="true">arrow_forward</mat-icon>
+      </a>
+    }
+  </main>
+
+</div>

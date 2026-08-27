@@ -1,21 +1,21 @@
 <div class="sidebar-content">
-  <div class="brand">
-    <span class="brand-icon">🏙️</span>
+  <a routerLink="/" class="brand" aria-label="CivicFix, vai alla home" (click)="linkActivated.emit()">
+    <mat-icon class="brand-icon" aria-hidden="true">location_city</mat-icon>
     <span class="brand-name">CivicFix</span>
-  </div>
+  </a>
 
   <nav class="nav-links">
-    <a routerLink="/reports" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-link">
-      <mat-icon>list_alt</mat-icon> Segnalazioni
+    <a routerLink="/reports" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-link" (click)="linkActivated.emit()">
+      <mat-icon aria-hidden="true">list_alt</mat-icon> Segnalazioni
     </a>
     @if (authService.role === 'CITIZEN') {
-      <a routerLink="/reports/new" routerLinkActive="active" class="nav-link">
-        <mat-icon>add_circle</mat-icon> Nuova segnalazione
+      <a routerLink="/reports/new" routerLinkActive="active" class="nav-link" (click)="linkActivated.emit()">
+        <mat-icon aria-hidden="true">add_circle</mat-icon> Nuova segnalazione
       </a>
     }
     @if (authService.role === 'ADMIN') {
-      <a routerLink="/admin" routerLinkActive="active" class="nav-link">
-        <mat-icon>admin_panel_settings</mat-icon> Gestione
+      <a routerLink="/admin" routerLinkActive="active" class="nav-link" (click)="linkActivated.emit()">
+        <mat-icon aria-hidden="true">admin_panel_settings</mat-icon> Gestione
       </a>
     }
   </nav>
@@ -23,15 +23,15 @@
   <div class="sidebar-spacer"></div>
 
   <div class="sidebar-footer">
-    <button mat-icon-button (click)="themeService.toggleTheme()">
-      <mat-icon>{{ themeService.isDarkTheme ? 'light_mode' : 'dark_mode' }}</mat-icon>
+    <button mat-icon-button [attr.aria-label]="themeService.isDarkTheme ? 'Attiva tema chiaro' : 'Attiva tema scuro'" (click)="themeService.toggleTheme()">
+      <mat-icon aria-hidden="true">{{ themeService.isDarkTheme ? 'light_mode' : 'dark_mode' }}</mat-icon>
     </button>
     <div class="user-info">
       <span class="username">{{ authService.username }}</span>
       <span class="role">{{ authService.role }}</span>
     </div>
-    <button mat-icon-button (click)="logout()">
-      <mat-icon>logout</mat-icon>
+    <button mat-icon-button aria-label="Esci" (click)="logout()">
+      <mat-icon aria-hidden="true">logout</mat-icon>
     </button>
   </div>
 </div>

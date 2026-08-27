@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
@@ -13,6 +13,8 @@ import { ThemeService } from '../../../core/services/theme.service';
   styleUrl: './navbar.component.scss'
 })
 export class NavbarComponent {
+  @Output() linkActivated = new EventEmitter<void>();
+
   constructor(
     public authService: AuthService,
     public themeService: ThemeService,
@@ -22,5 +24,6 @@ export class NavbarComponent {
   logout(): void {
     this.authService.logout();
     this.router.navigate(['/login']);
+    this.linkActivated.emit();
   }
 }

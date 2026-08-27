@@ -7,19 +7,24 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatIconModule } from '@angular/material/icon';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { AdminService } from '../../../core/services/admin.service';
 import { ReportService } from '../../../core/services/report.service';
 import { AdminUser, CreateUserRequest, CreateTeamRequest, Team } from '../../../core/models/admin.model';
 import { Role } from '../../../core/models/user.model';
-import { Report, ReportCategory } from '../../../core/models/report.model';
+import { Report } from '../../../core/models/report.model';
 import { ReportPriority } from '../../../core/models/report.model';
+import { UserDialogComponent } from '../user-dialog/user-dialog.component';
+import { TeamDialogComponent } from '../team-dialog/team-dialog.component';
 
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
   imports: [
     CommonModule, FormsModule, MatTabsModule, MatFormFieldModule,
-    MatInputModule, MatSelectModule, MatButtonModule, MatProgressSpinnerModule
+    MatInputModule, MatSelectModule, MatButtonModule, MatProgressSpinnerModule,
+    MatIconModule, MatDialogModule
   ],
   templateUrl: './admin-dashboard.component.html',
   styleUrl: './admin-dashboard.component.scss'
@@ -33,12 +38,6 @@ export class AdminDashboardComponent implements OnInit {
   errore: string | null = null;
   messaggio: string | null = null;
 
-  ruoliDisponibili = Object.values(Role);
-  categorieDisponibili = Object.values(ReportCategory);
-
-  nuovoUtente: CreateUserRequest = this.utenteVuoto();
-  nuovoTeam: CreateTeamRequest = { name: '', category: ReportCategory.VIABILITY };
-
   teamSceltoPerReport: { [reportId: number]: number } = {};
   prioritaDisponibili = Object.values(ReportPriority);
   prioritaSceltaPerReport: { [reportId: number]: ReportPriority } = {};
@@ -46,15 +45,12 @@ export class AdminDashboardComponent implements OnInit {
 
   constructor(
     private adminService: AdminService,
-    private reportService: ReportService
+    private reportService: ReportService,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
     this.caricaTutto();
-  }
-
-  private utenteVuoto(): CreateUserRequest {
-    return { username: '', email: '', password: '', fullName: '', role: Role.CITIZEN, teamId: null };
   }
 
   caricaTutto(): void {
@@ -92,15 +88,28 @@ export class AdminDashboardComponent implements OnInit {
     return report.status !== 'RESOLVED' && report.status !== 'REJECTED';
   }
 
-  creaUtente(): void {
+  apriDialogUtente(): void {
+    const ref = this.dialog.open(UserDialogComponent, {
+      data: { teams: this.teams },
+      autoFocus: 'first-tabbable',
+      restoreFocus: true
+    });
+
+    ref.afterClosed().subscribe((richiesta: CreateUserRequest | undefined) => {
+      if (richiesta) {
+        this.creaUtente(richiesta);
+      }
+    });
+  }
+
+  private creaUtente(richiesta: CreateUserRequest): void {
     this.errore = null;
     this.messaggio = null;
 
-    this.adminService.createUser(this.nuovoUtente).subscribe({
+    this.adminService.createUser(richiesta).subscribe({
       next: (utente) => {
         this.users = [...this.users, utente];
         this.mostraMessaggio(`Utente ${utente.username} creato.`);
-        this.nuovoUtente = this.utenteVuoto();
       },
       error: (err) => {
         this.mostraErrore(err.status === 409 ? 'Username o email già in uso.' : 'Impossibile creare l\'utente.');
@@ -108,15 +117,27 @@ export class AdminDashboardComponent implements OnInit {
     });
   }
 
-  creaTeam(): void {
+  apriDialogTeam(): void {
+    const ref = this.dialog.open(TeamDialogComponent, {
+      autoFocus: 'first-tabbable',
+      restoreFocus: true
+    });
+
+    ref.afterClosed().subscribe((richiesta: CreateTeamRequest | undefined) => {
+      if (richiesta) {
+        this.creaTeam(richiesta);
+      }
+    });
+  }
+
+  private creaTeam(richiesta: CreateTeamRequest): void {
     this.errore = null;
     this.messaggio = null;
 
-    this.adminService.createTeam(this.nuovoTeam).subscribe({
+    this.adminService.createTeam(richiesta).subscribe({
       next: (team) => {
         this.teams = [...this.teams, team];
         this.mostraMessaggio(`Team ${team.name} creato.`);
-        this.nuovoTeam = { name: '', category: ReportCategory.VIABILITY };
       },
       error: () => this.mostraErrore('Impossibile creare il team.')
     });

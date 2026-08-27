@@ -1,0 +1,156 @@
+.home-page {
+  min-height: calc(100vh - var(--footer-height));
+  display: flex;
+  flex-direction: column;
+}
+
+// Inside the authenticated shell the sidenav content already reserves room for
+// the nav rail, top bar and footer, so the full-viewport height would overflow.
+.home-page-shell {
+  min-height: 0;
+}
+
+.home-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  box-sizing: border-box;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: var(--color-primary);
+  text-decoration: none;
+}
+.brand mat-icon { color: var(--color-accent); }
+
+.home-nav {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.text-link {
+  color: var(--color-foreground);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.92rem;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+.text-link:hover { color: var(--color-accent); }
+.cta-link {
+  background: var(--color-accent);
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 8px 18px;
+  min-height: 44px;
+  box-sizing: border-box;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  transition: background-color 0.15s ease;
+}
+.cta-link:hover { background: var(--color-accent-strong); }
+
+.hero {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 48px 24px 64px;
+  box-sizing: border-box;
+}
+
+.hero h1 {
+  font-family: 'Poppins', sans-serif;
+  font-size: 2.4rem;
+  line-height: 1.15;
+  margin: 0 0 20px;
+  color: var(--color-foreground);
+}
+
+.lead {
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: var(--color-muted-foreground);
+  max-width: 560px;
+  margin: 0 0 48px;
+}
+
+.benefits {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  width: 100%;
+  margin-bottom: 48px;
+  text-align: left;
+}
+
+.benefit {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 24px 20px;
+}
+.benefit mat-icon {
+  color: var(--color-accent);
+  font-size: 28px;
+  width: 28px;
+  height: 28px;
+  margin-bottom: 12px;
+}
+.benefit h2 {
+  font-family: 'Poppins', sans-serif;
+  font-size: 1rem;
+  margin: 0 0 8px;
+  color: var(--color-foreground);
+}
+.benefit p {
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: var(--color-muted-foreground);
+  margin: 0;
+}
+
+.cta-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--color-accent);
+  color: #fff;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 1.05rem;
+  padding: 14px 32px;
+  min-height: 44px;
+  box-sizing: border-box;
+  border-radius: 999px;
+  transition: background-color 0.15s ease, transform 0.15s ease;
+}
+.cta-button:hover {
+  background: var(--color-accent-strong);
+  transform: translateY(-1px);
+}
+
+@media (max-width: 768px) {
+  .benefits { grid-template-columns: 1fr; }
+  .hero h1 { font-size: 1.9rem; }
+}
+
+@media (max-width: 480px) {
+  .home-topbar { padding: 16px; }
+  .cta-link span, .text-link span { font-size: 0.85rem; }
+  .hero { padding: 32px 16px 48px; }
+}

@@ -10,6 +10,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { ReportService } from '../../../core/services/report.service';
 import { CreateReportRequest, ReportCategory } from '../../../core/models/report.model';
+import { segnapostoPerCategoria } from '../../../core/constants/map-marker';
 
 @Component({
   selector: 'app-create-report',
@@ -23,6 +24,7 @@ export class CreateReportComponent implements AfterViewInit, OnDestroy {
 
   private map: L.Map | null = null;
   private marker: L.Marker | null = null;
+  private resizeObserver: ResizeObserver | null = null;
 
   categorieDisponibili = Object.values(ReportCategory);
 
@@ -44,6 +46,7 @@ export class CreateReportComponent implements AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.resizeObserver?.disconnect();
     this.map?.remove();
   }
 
@@ -57,6 +60,10 @@ export class CreateReportComponent implements AfterViewInit, OnDestroy {
     this.map.on('click', (event: L.LeafletMouseEvent) => {
       this.impostaPosizione(event.latlng.lat, event.latlng.lng);
     });
+
+    // Keep Leaflet's cached pixel offsets in sync with responsive layout changes.
+    this.resizeObserver = new ResizeObserver(() => this.map?.invalidateSize());
+    this.resizeObserver.observe(this.mapContainer.nativeElement);
   }
 
   private impostaPosizione(lat: number, lng: number): void {
@@ -66,7 +73,9 @@ export class CreateReportComponent implements AfterViewInit, OnDestroy {
     if (this.marker) {
       this.marker.setLatLng([lat, lng]);
     } else {
-      this.marker = L.marker([lat, lng]).addTo(this.map!);
+      this.marker = L.marker([lat, lng], {
+        icon: segnapostoPerCategoria(this.categoria)
+      }).addTo(this.map!);
     }
   }
 

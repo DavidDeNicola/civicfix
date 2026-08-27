@@ -38,6 +38,14 @@ public class User {
     @JoinColumn(name = "team_id")
     private Team team;
 
+    // Recupero password: si salva l'hash SHA-256 del token, mai il token in
+    // chiaro, così chi legge il database non può usarlo per impersonare
+    // l'utente. Entrambi i campi vengono azzerati appena il token è usato.
+    @Column(unique = true)
+    private String resetTokenHash;
+
+    private LocalDateTime resetTokenExpiresAt;
+
     @CreationTimestamp
     @Column(updatable = false)
     private LocalDateTime createdAt;

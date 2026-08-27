@@ -1,45 +1,53 @@
 .spinner-container { display: flex; justify-content: center; margin-top: 48px; }
 .tab-content { padding: 20px 4px; }
-.form-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-bottom: 28px; }
 
-.admin-table { width: 100%; border-collapse: separate; border-spacing: 0 8px; margin-bottom: 20px; }
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.section-header h3 { margin: 0; }
+
+.table-scroll { overflow-x: auto; margin-bottom: 20px; }
+.admin-table { width: 100%; min-width: 640px; border-collapse: separate; border-spacing: 0 8px; margin-bottom: 0; }
 .admin-table th {
   text-align: left; padding: 0 12px 8px; font-size: 0.8rem;
-  text-transform: uppercase; letter-spacing: 0.4px; color: #888;
+  text-transform: uppercase; letter-spacing: 0.4px; color: var(--color-muted-foreground);
 }
 .admin-table td {
-  background: #ffffff; padding: 14px 12px;
-  border-top: 1px solid rgba(128,128,128,0.1); border-bottom: 1px solid rgba(128,128,128,0.1);
+  background: var(--color-surface); padding: 14px 12px; color: var(--color-foreground);
+  border-top: 1px solid var(--color-border); border-bottom: 1px solid var(--color-border);
 }
-.admin-table tr td:first-child { border-left: 1px solid rgba(128,128,128,0.1); border-radius: 12px 0 0 12px; }
-.admin-table tr td:last-child { border-right: 1px solid rgba(128,128,128,0.1); border-radius: 0 12px 12px 0; }
+.admin-table tr td:first-child { border-left: 1px solid var(--color-border); border-radius: var(--radius-md) 0 0 var(--radius-md); }
+.admin-table tr td:last-child { border-right: 1px solid var(--color-border); border-radius: 0 var(--radius-md) var(--radius-md) 0; }
 
 .inline-select { width: 140px; margin-right: 8px; }
 
 .role-badge { padding: 3px 11px; border-radius: 999px; font-size: 0.7rem; font-weight: 700; color: #fff; display: inline-block; }
-.role-citizen  { background: #5e35b1; }
-.role-operator { background: #1e88e5; }
-.role-admin    { background: #e53935; }
+.role-citizen  { background: var(--role-citizen); }
+.role-operator { background: var(--role-operator); }
+.role-admin    { background: var(--role-admin); }
 
 .status-badge { padding: 4px 12px; border-radius: 999px; font-size: 0.72rem; font-weight: 700; color: #fff; letter-spacing: 0.3px; display: inline-block; }
-.status-pending     { background: #fb8c00; }
-.status-in_progress { background: #1e88e5; }
-.status-resolved    { background: #43a047; }
-.status-rejected    { background: #e53935; }
+.status-pending     { background: var(--status-pending); }
+.status-in_progress { background: var(--status-in-progress); }
+.status-resolved    { background: var(--status-resolved); }
+.status-rejected    { background: var(--status-rejected); }
 
-.error-message { color: #c62828; }
-.success-message { color: #2e7d32; }
-
-:host-context(.dark-theme) { .admin-table td { background: #1e1e1e; } }
+.error-message { color: var(--color-destructive); }
+.success-message { color: var(--status-resolved); }
 
 .closed-hint {
   font-size: 0.8rem;
-  color: #999;
+  color: var(--color-muted-foreground);
   font-style: italic;
 }
 
 .priority-badge { padding: 3px 11px; border-radius: 999px; font-size: 0.7rem; font-weight: 700; color: #fff; display: inline-block; }
-.priority-low    { background: #78909c; }
-.priority-normal { background: #1e88e5; }
-.priority-high   { background: #fb8c00; }
-.priority-urgent { background: #e53935; }
+.priority-low    { background: var(--priority-low); }
+.priority-normal { background: var(--priority-normal); }
+.priority-high   { background: var(--priority-high); }
+.priority-urgent { background: var(--priority-urgent); }

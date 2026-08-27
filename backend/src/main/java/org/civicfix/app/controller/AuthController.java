@@ -3,12 +3,15 @@ package org.civicfix.app.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.civicfix.app.dto.AuthResponse;
+import org.civicfix.app.dto.ForgotPasswordRequest;
 import org.civicfix.app.dto.LoginRequest;
 import org.civicfix.app.dto.RegisterRequest;
+import org.civicfix.app.dto.ResetPasswordRequest;
 import org.civicfix.app.model.Role;
 import org.civicfix.app.model.User;
 import org.civicfix.app.repository.UserRepository;
 import org.civicfix.app.security.JwtService;
+import org.civicfix.app.service.PasswordResetService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -27,6 +30,7 @@ public class AuthController {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final PasswordResetService passwordResetService;
 
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
@@ -63,5 +67,22 @@ public class AuthController {
 
         String token = jwtService.generateToken(user);
         return ResponseEntity.ok(new AuthResponse(token, user.getUsername(), user.getRole().name()));
+    }
+
+    /**
+     * Avvia il recupero password. Risponde sempre 204, anche quando l'email non
+     * è registrata: distinguere i due casi permetterebbe di scoprire quali
+     * indirizzi hanno un account.
+     */
+    @PostMapping("/forgot-password")
+    public ResponseEntity<Void> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+        passwordResetService.richiediReset(request.email());
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<Void> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+        passwordResetService.reimpostaPassword(request.token(), request.newPassword());
+        return ResponseEntity.noContent().build();
     }
 }

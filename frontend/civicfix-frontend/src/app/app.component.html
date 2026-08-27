@@ -1,7 +1,25 @@
 @if (authService.isLoggedIn()) {
-  <mat-sidenav-container class="app-shell">
-    <mat-sidenav mode="side" opened class="sidebar">
-      <app-navbar></app-navbar>
+  @let isMobile = (isMobile$ | async);
+
+  @if (isMobile) {
+    <mat-toolbar class="mobile-topbar">
+      <button mat-icon-button aria-label="Apri il menu di navigazione" (click)="sidenavOpened = !sidenavOpened">
+        <mat-icon aria-hidden="true">menu</mat-icon>
+      </button>
+      <a routerLink="/" class="mobile-brand" aria-label="CivicFix, vai alla home">
+        <mat-icon aria-hidden="true" class="mobile-brand-icon">location_city</mat-icon>
+        <span class="mobile-brand-name">CivicFix</span>
+      </a>
+    </mat-toolbar>
+  }
+
+  <mat-sidenav-container class="app-shell" [class.app-shell-mobile]="isMobile">
+    <mat-sidenav
+      [mode]="isMobile ? 'over' : 'side'"
+      [opened]="sidenavOpened"
+      (closedStart)="sidenavOpened = false"
+      class="sidebar">
+      <app-navbar (linkActivated)="closeOnMobile(!!isMobile)"></app-navbar>
     </mat-sidenav>
     <mat-sidenav-content class="content-area">
       <router-outlet></router-outlet>
@@ -10,3 +28,5 @@
 } @else {
   <router-outlet></router-outlet>
 }
+
+<app-footer></app-footer>

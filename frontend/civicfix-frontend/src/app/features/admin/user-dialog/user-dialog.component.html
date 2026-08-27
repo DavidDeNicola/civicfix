@@ -1,0 +1,55 @@
+<h2 mat-dialog-title>Nuovo utente</h2>
+
+<mat-dialog-content class="dialog-body">
+
+  @if (errore) {
+    <p class="error-message" role="alert">{{ errore }}</p>
+  }
+
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Username</mat-label>
+    <input matInput [(ngModel)]="utente.username" name="username" autocomplete="off" required>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Email</mat-label>
+    <input matInput type="email" [(ngModel)]="utente.email" name="email" autocomplete="off" required>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Nome completo</mat-label>
+    <input matInput [(ngModel)]="utente.fullName" name="fullName" autocomplete="off" required>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Password</mat-label>
+    <input matInput type="password" [(ngModel)]="utente.password" name="password" autocomplete="new-password" required>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Ruolo</mat-label>
+    <mat-select [(ngModel)]="utente.role" name="role">
+      @for (ruolo of ruoliDisponibili; track ruolo) {
+        <mat-option [value]="ruolo">{{ ruolo }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+
+  @if (serveTeam) {
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Team</mat-label>
+      <mat-select [(ngModel)]="utente.teamId" name="teamId">
+        @for (team of data.teams; track team.id) {
+          <mat-option [value]="team.id">{{ team.name }}</mat-option>
+        }
+      </mat-select>
+      <mat-hint>Obbligatorio per gli operatori</mat-hint>
+    </mat-form-field>
+  }
+
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="annulla()">Annulla</button>
+  <button mat-flat-button color="primary" (click)="conferma()">Crea utente</button>
+</mat-dialog-actions>

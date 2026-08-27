@@ -1,0 +1,29 @@
+<h2 mat-dialog-title>Nuovo team</h2>
+
+<mat-dialog-content class="dialog-body">
+
+  @if (errore) {
+    <p class="error-message" role="alert">{{ errore }}</p>
+  }
+
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Nome</mat-label>
+    <input matInput [(ngModel)]="team.name" name="name" autocomplete="off" required>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Categoria</mat-label>
+    <mat-select [(ngModel)]="team.category" name="category">
+      @for (categoria of categorieDisponibili; track categoria) {
+        <mat-option [value]="categoria">{{ categoria }}</mat-option>
+      }
+    </mat-select>
+    <mat-hint>Tipo di segnalazioni gestite dal team</mat-hint>
+  </mat-form-field>
+
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="annulla()">Annulla</button>
+  <button mat-flat-button color="primary" (click)="conferma()">Crea team</button>
+</mat-dialog-actions>
