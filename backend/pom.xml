@@ -50,6 +50,11 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-mail</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+			<version>3.1.0</version>
+		</dependency>
 
 		<dependency>
 			<groupId>com.mysql</groupId>
@@ -99,6 +104,24 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-webmvc-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<!-- Nessuno degli starter di test sopra porta Mockito in dipendenza
+		     transitiva in questo progetto: senza questa riga i test unitari
+		     sul service layer (mock dei repository, nessun database) non
+		     compilerebbero. La versione è gestita dalla BOM ereditata da
+		     spring-boot-starter-parent. -->
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-junit-jupiter</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<!-- Database in memoria per il test di contesto (@SpringBootTest): fa
+		     partire l'intera applicazione senza un MySQL reale ne' le
+		     variabili d'ambiente di produzione. -->
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

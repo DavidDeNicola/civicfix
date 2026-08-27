@@ -312,5 +312,86 @@
       </div>
     </mat-tab>
 
+    <!-- ---------------------------------------------------------------- -->
+    <mat-tab label="Statistiche">
+      <div class="tab-content">
+
+        @if (caricamentoStatistiche) {
+          <div class="spinner-container"><mat-spinner></mat-spinner></div>
+        } @else if (erroreStatistiche) {
+          <p class="error-message" role="alert">{{ erroreStatistiche }}</p>
+        } @else if (statistiche) {
+
+          <div class="statistiche-azioni">
+            <button mat-stroked-button type="button" (click)="esportaCsv()">
+              <mat-icon aria-hidden="true">table_view</mat-icon>
+              Esporta CSV
+            </button>
+            <button mat-stroked-button type="button" (click)="esportaPdf()">
+              <mat-icon aria-hidden="true">picture_as_pdf</mat-icon>
+              Esporta PDF
+            </button>
+          </div>
+
+          <div class="kpi-riga">
+            <div class="kpi-scheda">
+              <span class="kpi-valore">{{ statistiche.totalReports }}</span>
+              <span class="kpi-etichetta">Segnalazioni totali</span>
+            </div>
+            <div class="kpi-scheda">
+              <span class="kpi-valore">
+                {{ statistiche.averageResolutionHours !== null
+                  ? (statistiche.averageResolutionHours | number:'1.0-1') + ' h'
+                  : '—' }}
+              </span>
+              <span class="kpi-etichetta">Tempo medio di risoluzione</span>
+            </div>
+          </div>
+
+          <div class="grafici-riga">
+            <section class="grafico-scheda">
+              <h4>Per stato</h4>
+              <div class="grafico-contenitore">
+                <canvas #canvasStato></canvas>
+              </div>
+            </section>
+
+            <section class="grafico-scheda">
+              <h4>Per categoria</h4>
+              <div class="grafico-contenitore">
+                <canvas #canvasCategoria></canvas>
+              </div>
+            </section>
+
+            <section class="grafico-scheda">
+              <h4>Per priorità</h4>
+              <div class="grafico-contenitore">
+                <canvas #canvasPriorita></canvas>
+              </div>
+            </section>
+          </div>
+
+          <section class="grafico-scheda grafico-mensile">
+            <h4>Andamento ultimi 12 mesi</h4>
+            <div class="grafico-contenitore grafico-contenitore-largo">
+              <canvas #canvasMensile></canvas>
+            </div>
+          </section>
+
+          <section class="grafico-scheda">
+            <h4>Team più attivi <span class="sottotitolo-grafico">(segnalazioni risolte)</span></h4>
+            @if (statistiche.topTeams.length === 0) {
+              <p class="vuoto">Nessuna segnalazione risolta ancora.</p>
+            } @else {
+              <div class="grafico-contenitore grafico-contenitore-largo">
+                <canvas #canvasTeam></canvas>
+              </div>
+            }
+          </section>
+
+        }
+      </div>
+    </mat-tab>
+
   </mat-tab-group>
 }

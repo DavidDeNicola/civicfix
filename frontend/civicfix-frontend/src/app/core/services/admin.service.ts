@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { AdminUser, CreateUserRequest, CreateTeamRequest, Team } from '../models/admin.model';
+import { AdminUser, CreateUserRequest, CreateTeamRequest, Team, Statistics } from '../models/admin.model';
 
 const USERS_URL = 'http://localhost:8080/api/admin/users';
 const TEAMS_URL = 'http://localhost:8080/api/admin/teams';
+const STATISTICS_URL = 'http://localhost:8080/api/admin/statistics';
 
 @Injectable({ providedIn: 'root' })
 export class AdminService {
@@ -29,5 +30,9 @@ export class AdminService {
 
   createTeam(dto: CreateTeamRequest): Observable<Team> {
     return this.http.post<Team>(TEAMS_URL, dto);
+  }
+
+  getStatistics(): Observable<Statistics> {
+    return this.http.get<Statistics>(STATISTICS_URL);
   }
 }

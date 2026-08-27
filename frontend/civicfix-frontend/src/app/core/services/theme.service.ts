@@ -1,5 +1,6 @@
 import { Injectable, Renderer2, RendererFactory2, Inject } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
+import { Subject } from 'rxjs';
 
 const THEME_KEY = 'civicfix_theme';
 
@@ -9,6 +10,11 @@ const THEME_KEY = 'civicfix_theme';
 export class ThemeService {
   private renderer: Renderer2;
   isDarkTheme: boolean = false;
+
+  // Serve a chi disegna su canvas (es. i grafici Chart.js): quei colori sono
+  // pixel già tracciati, non CSS, quindi non seguono da soli il cambio tema.
+  private cambiamentoTema = new Subject<void>();
+  readonly cambiamentoTema$ = this.cambiamentoTema.asObservable();
 
   constructor(
     rendererFactory: RendererFactory2,
@@ -22,6 +28,7 @@ export class ThemeService {
     this.isDarkTheme = !this.isDarkTheme;
     this.applyTheme();
     localStorage.setItem(THEME_KEY, this.isDarkTheme ? 'dark' : 'light');
+    this.cambiamentoTema.next();
   }
 
   private applyTheme(): void {

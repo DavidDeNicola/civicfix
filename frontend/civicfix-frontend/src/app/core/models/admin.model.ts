@@ -31,3 +31,23 @@ export interface CreateTeamRequest {
   name: string;
   category: ReportCategory;
 }
+
+export interface MonthlyCount {
+  month: string;
+  count: number;
+}
+
+export interface TeamCount {
+  teamName: string;
+  resolvedCount: number;
+}
+
+export interface Statistics {
+  totalReports: number;
+  byStatus: Record<string, number>;
+  byCategory: Record<string, number>;
+  byPriority: Record<string, number>;
+  reportsPerMonth: MonthlyCount[];
+  averageResolutionHours: number | null;
+  topTeams: TeamCount[];
+}

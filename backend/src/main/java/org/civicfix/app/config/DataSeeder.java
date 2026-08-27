@@ -58,29 +58,37 @@ public class DataSeeder implements CommandLineRunner {
             "Giordano", "Mancini", "Rizzo", "Lombardi", "Moretti", "Fontana", "Serra"
     };
 
+    /** Vie reali di Lecce: danno un indirizzo diverso a segnalazioni con lo stesso titolo. */
+    private static final String[] VIE = {
+            "Via Roma", "Viale Gallipoli", "Via Cavallotti", "Via Palmieri", "Via Trinchese",
+            "Via del Mare", "Piazza Mazzini", "Via Adriatica", "Via Merine", "Viale Otranto",
+            "Via Taranto", "Via San Nicola", "Via Napoli", "Viale Lo Re", "Via Salvatore Grande",
+            "Via Leonardo da Vinci", "Viale Don Minzoni", "Via Giuseppe Candido"
+    };
+
     private record ModelloSegnalazione(
-            String titolo, String descrizione, ReportCategory categoria, double dLat, double dLng, String via) {
+            String titolo, String descrizione, ReportCategory categoria, double dLat, double dLng) {
     }
 
     /** Titoli e descrizioni verosimili, uno per categoria così ogni team ha lavoro assegnabile. */
     private static final ModelloSegnalazione[] MODELLI = {
-            new ModelloSegnalazione("Buca pericolosa", "Buca profonda vicino al marciapiede", ReportCategory.VIABILITY, 0.002, -0.003, "Via Roma"),
-            new ModelloSegnalazione("Asfalto dissestato", "Tratto di strada con crepe estese", ReportCategory.VIABILITY, -0.010, 0.006, "Viale Gallipoli"),
-            new ModelloSegnalazione("Segnaletica scomparsa", "Strisce pedonali non più visibili", ReportCategory.VIABILITY, 0.015, 0.010, "Via Cavallotti"),
-            new ModelloSegnalazione("Lampione spento", "Luce non funzionante da una settimana", ReportCategory.LIGHTING, 0.004, -0.006, "Via Palmieri"),
-            new ModelloSegnalazione("Illuminazione intermittente", "Il lampione lampeggia di continuo", ReportCategory.LIGHTING, -0.006, 0.012, "Via Trinchese"),
-            new ModelloSegnalazione("Zona buia la sera", "Assenza totale di illuminazione pubblica", ReportCategory.LIGHTING, 0.011, -0.014, "Via del Mare"),
-            new ModelloSegnalazione("Cassonetto pieno", "Rifiuti accumulati fuori dal cassonetto", ReportCategory.WASTE, -0.003, 0.004, "Piazza Mazzini"),
-            new ModelloSegnalazione("Rifiuti abbandonati", "Sacchi lasciati sul marciapiede", ReportCategory.WASTE, 0.008, 0.002, "Via Adriatica"),
-            new ModelloSegnalazione("Raccolta saltata", "Il ritiro non passa da tre giorni", ReportCategory.WASTE, -0.012, -0.008, "Via Merine"),
-            new ModelloSegnalazione("Aiuola incolta", "Erba alta e rami secchi", ReportCategory.GREEN_AREAS, 0.006, 0.015, "Giardini Pubblici"),
-            new ModelloSegnalazione("Albero pericolante", "Ramo spezzato sospeso sul sentiero", ReportCategory.GREEN_AREAS, -0.009, 0.009, "Villa Comunale"),
-            new ModelloSegnalazione("Panchine rotte", "Due panchine del parco danneggiate", ReportCategory.GREEN_AREAS, 0.013, -0.005, "Parco Belloluogo"),
-            new ModelloSegnalazione("Perdita idrica", "Acqua che sgorga dal marciapiede", ReportCategory.WATER, 0.005, -0.011, "Viale Otranto"),
-            new ModelloSegnalazione("Tombino otturato", "Ristagno d'acqua dopo la pioggia", ReportCategory.WATER, -0.007, -0.002, "Via Taranto"),
-            new ModelloSegnalazione("Pressione idrica bassa", "Da giorni l'acqua esce debole", ReportCategory.WATER, 0.009, 0.007, "Via Lecce-Torre"),
-            new ModelloSegnalazione("Cartello caduto", "Segnale stradale a terra dopo il vento", ReportCategory.OTHER, -0.004, 0.011, "Via San Nicola"),
-            new ModelloSegnalazione("Muretto danneggiato", "Muro di contenimento con crepe visibili", ReportCategory.OTHER, 0.007, -0.009, "Via Napoli"),
+            new ModelloSegnalazione("Buca pericolosa", "Buca profonda vicino al marciapiede", ReportCategory.VIABILITY, 0.002, -0.003),
+            new ModelloSegnalazione("Asfalto dissestato", "Tratto di strada con crepe estese", ReportCategory.VIABILITY, -0.010, 0.006),
+            new ModelloSegnalazione("Segnaletica scomparsa", "Strisce pedonali non più visibili", ReportCategory.VIABILITY, 0.015, 0.010),
+            new ModelloSegnalazione("Lampione spento", "Luce non funzionante da una settimana", ReportCategory.LIGHTING, 0.004, -0.006),
+            new ModelloSegnalazione("Illuminazione intermittente", "Il lampione lampeggia di continuo", ReportCategory.LIGHTING, -0.006, 0.012),
+            new ModelloSegnalazione("Zona buia la sera", "Assenza totale di illuminazione pubblica", ReportCategory.LIGHTING, 0.011, -0.014),
+            new ModelloSegnalazione("Cassonetto pieno", "Rifiuti accumulati fuori dal cassonetto", ReportCategory.WASTE, -0.003, 0.004),
+            new ModelloSegnalazione("Rifiuti abbandonati", "Sacchi lasciati sul marciapiede", ReportCategory.WASTE, 0.008, 0.002),
+            new ModelloSegnalazione("Raccolta saltata", "Il ritiro non passa da tre giorni", ReportCategory.WASTE, -0.012, -0.008),
+            new ModelloSegnalazione("Aiuola incolta", "Erba alta e rami secchi", ReportCategory.GREEN_AREAS, 0.006, 0.015),
+            new ModelloSegnalazione("Albero pericolante", "Ramo spezzato sospeso sul sentiero", ReportCategory.GREEN_AREAS, -0.009, 0.009),
+            new ModelloSegnalazione("Panchine rotte", "Due panchine del parco danneggiate", ReportCategory.GREEN_AREAS, 0.013, -0.005),
+            new ModelloSegnalazione("Perdita idrica", "Acqua che sgorga dal marciapiede", ReportCategory.WATER, 0.005, -0.011),
+            new ModelloSegnalazione("Tombino otturato", "Ristagno d'acqua dopo la pioggia", ReportCategory.WATER, -0.007, -0.002),
+            new ModelloSegnalazione("Pressione idrica bassa", "Da giorni l'acqua esce debole", ReportCategory.WATER, 0.009, 0.007),
+            new ModelloSegnalazione("Cartello caduto", "Segnale stradale a terra dopo il vento", ReportCategory.OTHER, -0.004, 0.011),
+            new ModelloSegnalazione("Muretto danneggiato", "Muro di contenimento con crepe visibili", ReportCategory.OTHER, 0.007, -0.009),
     };
 
     @Override
@@ -201,13 +209,15 @@ public class DataSeeder implements CommandLineRunner {
             User autore = citizens.get(random.nextInt(citizens.size()));
 
             Report report = new Report();
-            // Titoli non ripetuti: il modello si ricicla più volte sulle 60 segnalazioni.
-            report.setTitle(modello.titolo() + (i >= MODELLI.length ? " (" + (i / MODELLI.length + 1) + ")" : ""));
+            // Titoli ripetuti di proposito: nella realtà più cittadini segnalano
+            // lo stesso tipo di problema. A distinguerli è l'indirizzo, che
+            // viene scelto fra vie diverse invece di accodare un contatore.
+            report.setTitle(modello.titolo());
             report.setDescription(modello.descrizione());
             report.setCategory(modello.categoria());
             report.setLatitude(LAT_BASE + modello.dLat() + jitter());
             report.setLongitude(LNG_BASE + modello.dLng() + jitter());
-            report.setAddress(modello.via() + ", Lecce");
+            report.setAddress(VIE[random.nextInt(VIE.length)] + " " + (1 + random.nextInt(120)) + ", Lecce");
             report.setReporter(autore);
             report.setPriority(priorita[random.nextInt(priorita.length)]);
 

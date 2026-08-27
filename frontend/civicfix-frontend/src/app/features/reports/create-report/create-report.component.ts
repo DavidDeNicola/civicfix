@@ -8,7 +8,9 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import { MatIconModule } from '@angular/material/icon';
 import { ReportService } from '../../../core/services/report.service';
+import { GeocodingService, RisultatoGeocoding } from '../../../core/services/geocoding.service';
 import { CreateReportRequest, ReportCategory } from '../../../core/models/report.model';
 import { segnapostoPerCategoria } from '../../../core/constants/map-marker';
 import { CategoriaPipe } from '../../../core/pipes/etichette.pipe';
@@ -16,7 +18,10 @@ import { CategoriaPipe } from '../../../core/pipes/etichette.pipe';
 @Component({
   selector: 'app-create-report',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatButtonModule, MatCardModule, CategoriaPipe],
+  imports: [
+    CommonModule, FormsModule, MatFormFieldModule, MatInputModule, MatSelectModule,
+    MatButtonModule, MatCardModule, MatIconModule, CategoriaPipe
+  ],
   templateUrl: './create-report.component.html',
   styleUrl: './create-report.component.scss'
 })
@@ -44,8 +49,14 @@ export class CreateReportComponent implements OnInit, AfterViewInit, OnDestroy {
   caricamento: boolean = false;
   errore: string | null = null;
 
+  risultatiIndirizzo: RisultatoGeocoding[] = [];
+  ricercaIndirizzoInCorso: boolean = false;
+  erroreRicercaIndirizzo: string | null = null;
+  ricercaInversaInCorso: boolean = false;
+
   constructor(
     private reportService: ReportService,
+    private geocodingService: GeocodingService,
     private router: Router,
     private route: ActivatedRoute
   ) {}
@@ -98,6 +109,7 @@ export class CreateReportComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.map.on('click', (event: L.LeafletMouseEvent) => {
       this.impostaPosizione(event.latlng.lat, event.latlng.lng);
+      this.geocodificaInversa(event.latlng.lat, event.latlng.lng);
     });
 
     // Keep Leaflet's cached pixel offsets in sync with responsive layout changes.
@@ -116,6 +128,42 @@ export class CreateReportComponent implements OnInit, AfterViewInit, OnDestroy {
         icon: segnapostoPerCategoria(this.categoria)
       }).addTo(this.map!);
     }
+  }
+
+  cercaIndirizzo(): void {
+    const testo = this.indirizzo.trim();
+    if (!testo || this.ricercaIndirizzoInCorso) return;
+
+    this.ricercaIndirizzoInCorso = true;
+    this.erroreRicercaIndirizzo = null;
+    this.risultatiIndirizzo = [];
+
+    this.geocodingService.cerca(testo).subscribe(risultati => {
+      this.ricercaIndirizzoInCorso = false;
+      if (risultati.length === 0) {
+        this.erroreRicercaIndirizzo = 'Nessun indirizzo trovato.';
+        return;
+      }
+      this.risultatiIndirizzo = risultati;
+    });
+  }
+
+  scegliRisultato(risultato: RisultatoGeocoding): void {
+    this.indirizzo = risultato.indirizzo;
+    this.risultatiIndirizzo = [];
+    this.impostaPosizione(risultato.lat, risultato.lng);
+    this.map?.setView([risultato.lat, risultato.lng], 16);
+  }
+
+  /** Riempie il campo indirizzo dopo un click sulla mappa, senza sovrascrivere una ricerca in corso. */
+  private geocodificaInversa(lat: number, lng: number): void {
+    this.ricercaInversaInCorso = true;
+    this.geocodingService.inversa(lat, lng).subscribe(indirizzo => {
+      this.ricercaInversaInCorso = false;
+      if (indirizzo) {
+        this.indirizzo = indirizzo;
+      }
+    });
   }
 
   onFileSelected(event: Event): void {

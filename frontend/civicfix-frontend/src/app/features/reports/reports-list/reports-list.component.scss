@@ -3,7 +3,8 @@
 .filters-sidebar {
   width: 260px; flex-shrink: 0; background: var(--color-surface);
   border-radius: var(--radius-lg); padding: 20px;
-  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.06);
+  border: 1px solid var(--color-border);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
   position: sticky; top: 32px;
   box-sizing: border-box;
   max-width: 100%;
@@ -49,7 +50,7 @@
 .create-btn:hover { background: var(--color-accent-strong); transform: translateY(-1px); }
 
 .spinner-container { display: flex; justify-content: center; margin-top: 48px; }
-.reports-list-col { display: flex; flex-direction: column; gap: 14px; }
+.reports-list-col { display: flex; flex-direction: column; gap: 22px; }
 
 .status-section { margin-bottom: 32px; }
 .section-title {

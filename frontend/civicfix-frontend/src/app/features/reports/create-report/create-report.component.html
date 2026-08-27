@@ -23,12 +23,42 @@
       </mat-select>
     </mat-form-field>
 
-    <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Indirizzo (facoltativo)</mat-label>
-      <input matInput [(ngModel)]="indirizzo">
-    </mat-form-field>
+    <div class="riga-indirizzo">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Indirizzo (facoltativo)</mat-label>
+        <input matInput [(ngModel)]="indirizzo" (keyup.enter)="cercaIndirizzo()"
+               placeholder="Es. Via Roma 12, Lecce">
+        <mat-hint>Scrivi una via e cerca, oppure indica il punto direttamente sulla mappa</mat-hint>
+      </mat-form-field>
+      <button mat-stroked-button type="button" class="btn-cerca"
+              [disabled]="ricercaIndirizzoInCorso || !indirizzo.trim()"
+              (click)="cercaIndirizzo()">
+        <mat-icon aria-hidden="true">search</mat-icon>
+        {{ ricercaIndirizzoInCorso ? 'Ricerca...' : 'Cerca' }}
+      </button>
+    </div>
 
-    <p class="map-hint">Clicca sulla mappa per indicare la posizione della segnalazione</p>
+    @if (erroreRicercaIndirizzo) {
+      <p class="errore-ricerca" role="alert">{{ erroreRicercaIndirizzo }}</p>
+    }
+
+    @if (risultatiIndirizzo.length > 0) {
+      <ul class="risultati-indirizzo">
+        @for (risultato of risultatiIndirizzo; track risultato.indirizzo) {
+          <li>
+            <button type="button" (click)="scegliRisultato(risultato)">
+              <mat-icon aria-hidden="true">place</mat-icon>
+              <span>{{ risultato.indirizzo }}</span>
+            </button>
+          </li>
+        }
+      </ul>
+    }
+
+    <p class="map-hint">
+      Clicca sulla mappa per indicare la posizione della segnalazione
+      @if (ricercaInversaInCorso) { <span class="rilevamento">· rilevamento indirizzo...</span> }
+    </p>
     <div #mapContainer class="map-container"></div>
 
     @if (latitudine !== null && longitudine !== null) {

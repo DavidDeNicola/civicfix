@@ -50,6 +50,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             }
         } catch (JwtException | IllegalArgumentException ex) {
             log.warn("Token JWT non valido: {}", ex.getMessage());
+        } catch (org.springframework.security.core.userdetails.UsernameNotFoundException ex) {
+            // Capita dopo un reset del database in sviluppo: il token è
+            // valido ma l'utente a cui si riferiva non esiste più. Senza
+            // questo catch l'eccezione risalirebbe fuori dalla catena dei
+            // filtri come 500, invece di lasciare la richiesta semplicemente
+            // non autenticata (la gestisce poi JsonAuthenticationEntryPoint).
+            log.warn("Token JWT valido ma utente non più esistente: {}", ex.getMessage());
         }
 
         filterChain.doFilter(request, response);

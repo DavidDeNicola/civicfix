@@ -4,7 +4,9 @@
   // its own full-width line rather than squeezing the text beside it.
   flex-wrap: wrap;
   background: var(--color-surface); border-radius: var(--radius-lg); padding: 18px 20px;
-  cursor: pointer; box-shadow: 0 2px 10px rgba(15, 23, 42, 0.06);
+  cursor: pointer;
+  border: 1px solid var(--color-border);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
   border-left: 5px solid transparent; width: 100%; box-sizing: border-box;
   overflow: hidden;
   // The space actually available depends on sibling layout (the filters
@@ -13,7 +15,7 @@
   container-type: inline-size;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
-.report-card:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(15, 23, 42, 0.14); }
+.report-card:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(15, 23, 42, 0.18); }
 
 .accent-viability   { border-left-color: var(--cat-viability); }
 .accent-lighting    { border-left-color: var(--cat-lighting); }
