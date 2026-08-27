@@ -8,13 +8,14 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { CreateTeamRequest } from '../../../core/models/admin.model';
 import { ReportCategory } from '../../../core/models/report.model';
+import { CategoriaPipe } from '../../../core/pipes/etichette.pipe';
 
 @Component({
   selector: 'app-team-dialog',
   standalone: true,
   imports: [
     CommonModule, FormsModule, MatDialogModule, MatFormFieldModule,
-    MatInputModule, MatSelectModule, MatButtonModule
+    MatInputModule, MatSelectModule, MatButtonModule, CategoriaPipe
   ],
   templateUrl: './team-dialog.component.html',
   styleUrl: './team-dialog.component.scss'

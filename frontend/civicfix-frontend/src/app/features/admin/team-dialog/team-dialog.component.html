@@ -15,7 +15,7 @@
     <mat-label>Categoria</mat-label>
     <mat-select [(ngModel)]="team.category" name="category">
       @for (categoria of categorieDisponibili; track categoria) {
-        <mat-option [value]="categoria">{{ categoria }}</mat-option>
+        <mat-option [value]="categoria">{{ categoria | categoria }}</mat-option>
       }
     </mat-select>
     <mat-hint>Tipo di segnalazioni gestite dal team</mat-hint>

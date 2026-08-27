@@ -6,11 +6,12 @@ import * as L from 'leaflet';
 import { Report } from '../../../core/models/report.model';
 import { ICONE_CATEGORIA } from '../../../core/constants/category-icons';
 import { segnapostoPerCategoria } from '../../../core/constants/map-marker';
+import { CategoriaPipe, PrioritaPipe, StatoPipe } from '../../../core/pipes/etichette.pipe';
 
 @Component({
   selector: 'app-report-card',
   standalone: true,
-  imports: [CommonModule, RouterLink, MatIconModule],
+  imports: [CommonModule, RouterLink, MatIconModule, StatoPipe, PrioritaPipe, CategoriaPipe],
   templateUrl: './report-card.component.html',
   styleUrl: './report-card.component.scss'
 })

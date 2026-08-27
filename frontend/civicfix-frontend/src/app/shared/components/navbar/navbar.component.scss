@@ -76,3 +76,87 @@
   font-size: 0.75rem;
   color: var(--color-muted-foreground);
 }
+
+// --- Barra ridotta a icone (solo desktop) --------------------------------
+//
+// Sotto i 769px la sidenav è un drawer a scomparsa e resta larga: questo
+// comportamento vale solo quando la barra è sempre visibile a fianco del
+// contenuto. Il pannello si sovrappone al contenuto invece di allargare la
+// sidenav, perché Material calcola il margine del contenuto una volta sola e
+// non lo seguirebbe durante l'animazione.
+@media (min-width: 769px) {
+  :host {
+    display: block;
+    height: 100%;
+  }
+
+  .sidebar-content {
+    // Resta nel flusso — se fosse assoluto la sidenav collasserebbe a
+    // altezza zero — ed è più stretto del contenuto che ospita: allargandosi
+    // deborda semplicemente oltre il bordo destro della sidenav, che ha
+    // overflow visibile. position:relative serve solo per lo z-index.
+    position: relative;
+    z-index: 4;
+    width: var(--rail-width);
+    overflow: hidden;
+    background: var(--color-surface);
+    border-right: 1px solid var(--color-border);
+    transition: width 0.18s ease, box-shadow 0.18s ease;
+  }
+
+  // :focus-within apre la barra anche a chi naviga da tastiera, che non può
+  // produrre un hover.
+  .sidebar-content:hover,
+  .sidebar-content:focus-within {
+    width: var(--rail-width-expanded);
+    box-shadow: 8px 0 28px rgba(15, 23, 42, 0.18);
+  }
+
+  // Le etichette restano nel DOM (e quindi accessibili agli screen reader),
+  // ma sfumano via quando la barra è chiusa.
+  .etichetta {
+    opacity: 0;
+    transition: opacity 0.14s ease;
+    white-space: nowrap;
+  }
+
+  // Le etichette con white-space:nowrap eccedono i 72px della barra chiusa e,
+  // essendo le icone flex item comprimibili, le schiacciavano a larghezza
+  // zero: qui si fissa la loro dimensione e si lascia cedere solo il testo.
+  .brand mat-icon,
+  .nav-link mat-icon {
+    flex: 0 0 auto;
+  }
+  .brand .etichetta,
+  .nav-link .etichetta {
+    min-width: 0;
+  }
+  .sidebar-content:hover .etichetta,
+  .sidebar-content:focus-within .etichetta {
+    opacity: 1;
+  }
+
+  .brand,
+  .nav-link {
+    // Le icone restano allineate sulla stessa colonna sia da chiusa che da
+    // aperta, così l'espansione non le fa saltare.
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .sidebar-footer {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
+  .user-info {
+    // Larghezza zero da chiusa: evita che il testo spinga i pulsanti fuori
+    // dal bordo mentre la barra è stretta.
+    flex: 0 1 0;
+    min-width: 0;
+  }
+  .sidebar-content:hover .user-info,
+  .sidebar-content:focus-within .user-info {
+    flex: 1 1 auto;
+  }
+}

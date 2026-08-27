@@ -10,7 +10,7 @@
     <div class="checkbox-group">
       @for (stato of statiDisponibiliFiltro; track stato) {
         <mat-checkbox [checked]="statiSelezionati.has(stato)" (change)="toggleStato(stato)">
-          {{ stato }}
+          {{ stato | stato }}
         </mat-checkbox>
       }
     </div>
@@ -19,7 +19,7 @@
     <div class="checkbox-group">
       @for (categoria of categorieDisponibili; track categoria) {
         <mat-checkbox [checked]="categorieSelezionate.has(categoria)" (change)="toggleCategoria(categoria)">
-          {{ categoria }}
+          {{ categoria | categoria }}
         </mat-checkbox>
       }
     </div>

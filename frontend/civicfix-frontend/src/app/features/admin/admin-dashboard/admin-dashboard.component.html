@@ -2,142 +2,313 @@
   <div class="spinner-container"><mat-spinner></mat-spinner></div>
 } @else {
 
-  @if (errore) { <p class="error-message">{{ errore }}</p> }
-  @if (messaggio) { <p class="success-message">{{ messaggio }}</p> }
+  @if (errore) { <p class="error-message" role="alert">{{ errore }}</p> }
+  @if (messaggio) { <p class="success-message" role="status">{{ messaggio }}</p> }
 
   <mat-tab-group>
 
+    <!-- ---------------------------------------------------------------- -->
     <mat-tab label="Utenti">
       <div class="tab-content">
 
         <div class="section-header">
-          <h3>Elenco utenti</h3>
+          <h3>Utenti registrati</h3>
           <button mat-flat-button color="primary" (click)="apriDialogUtente()">
             <mat-icon aria-hidden="true">person_add</mat-icon>
             Crea utente
           </button>
         </div>
-        <div class="table-scroll">
-          <table class="admin-table">
-            <thead>
-            <tr><th scope="col">Username</th><th scope="col">Email</th><th scope="col">Ruolo</th><th scope="col">Team</th><th scope="col">Riassegna team</th></tr>
-            </thead>
-            <tbody>
-              @for (utente of users; track utente.id) {
-                <tr>
-                  <td>{{ utente.username }}</td>
-                  <td>{{ utente.email }}</td>
-                  <td><span class="role-badge" [ngClass]="'role-' + utente.role.toLowerCase()">{{ utente.role }}</span></td>
-                  <td>{{ utente.teamName ?? '—' }}</td>
-                  <td>
+
+        @for (ruolo of ruoliOrdinati; track ruolo) {
+          @if (utentiPerRuolo(ruolo).length > 0) {
+            <section class="gruppo">
+              <h4 class="gruppo-titolo" [ngClass]="'gruppo-' + ruolo.toLowerCase()">
+                <mat-icon aria-hidden="true">{{ iconeRuolo[ruolo] }}</mat-icon>
+                {{ etichettaGruppoRuolo(ruolo) }}
+                <span class="conteggio">{{ utentiPerRuolo(ruolo).length }}</span>
+              </h4>
+
+              <div class="griglia">
+                @for (utente of utentiPerRuolo(ruolo); track utente.id) {
+                  <article class="scheda" [ngClass]="'accento-' + ruolo.toLowerCase()">
+                    <header class="scheda-testa">
+                      <div class="avatar" [ngClass]="'avatar-' + ruolo.toLowerCase()">
+                        <mat-icon aria-hidden="true">{{ iconeRuolo[ruolo] }}</mat-icon>
+                      </div>
+                      <div class="scheda-identita">
+                        <strong>{{ utente.username }}</strong>
+                        <span class="sottotitolo">{{ utente.fullName }}</span>
+                      </div>
+                    </header>
+
+                    <dl class="dettagli">
+                      <div>
+                        <dt>Email</dt>
+                        <dd>{{ utente.email }}</dd>
+                      </div>
+                      <div>
+                        <dt>Ruolo</dt>
+                        <dd><span class="role-badge" [ngClass]="'role-' + utente.role.toLowerCase()">{{ utente.role | ruolo }}</span></dd>
+                      </div>
+                      @if (utente.role === 'OPERATOR') {
+                        <div>
+                          <dt>Team</dt>
+                          <dd>{{ utente.teamName ?? 'Non assegnato' }}</dd>
+                        </div>
+                      }
+                    </dl>
+
                     @if (utente.role === 'OPERATOR') {
-                      <mat-form-field appearance="outline" class="inline-select">
-                        <mat-select [(ngModel)]="utente.teamId" (selectionChange)="assegnaTeamUtente(utente.id, utente.teamId!)">
-                          @for (team of teams; track team.id) {
-                            <mat-option [value]="team.id">{{ team.name }}</mat-option>
-                          }
-                        </mat-select>
-                      </mat-form-field>
+                      <div class="scheda-azione">
+                        <mat-form-field appearance="outline" class="campo">
+                          <mat-label>Riassegna team</mat-label>
+                          <mat-select [(ngModel)]="utente.teamId"
+                                      (selectionChange)="assegnaTeamUtente(utente.id, utente.teamId!)">
+                            @for (team of teams; track team.id) {
+                              <mat-option [value]="team.id">{{ team.name }}</mat-option>
+                            }
+                          </mat-select>
+                        </mat-form-field>
+                      </div>
                     }
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
+                  </article>
+                }
+              </div>
+            </section>
+          }
+        }
       </div>
     </mat-tab>
 
+    <!-- ---------------------------------------------------------------- -->
     <mat-tab label="Team">
       <div class="tab-content">
 
         <div class="section-header">
-          <h3>Elenco team</h3>
+          <h3>Team operativi</h3>
           <button mat-flat-button color="primary" (click)="apriDialogTeam()">
             <mat-icon aria-hidden="true">group_add</mat-icon>
             Crea team
           </button>
         </div>
-        <div class="table-scroll">
-          <table class="admin-table">
-            <thead>
-            <tr><th scope="col">Nome</th><th scope="col">Categoria</th><th scope="col">Membri</th></tr>
-            </thead>
-            <tbody>
-              @for (team of teams; track team.id) {
-                <tr>
-                  <td>{{ team.name }}</td>
-                  <td>{{ team.category }}</td>
-                  <td>{{ team.memberCount }}</td>
-                </tr>
+
+        @if (teams.length === 0) {
+          <p class="vuoto">Nessun team ancora creato.</p>
+        }
+
+        @for (categoria of categorieConTeam; track categoria) {
+          <section class="gruppo">
+            <h4 class="gruppo-titolo" [ngClass]="'cat-testo-' + categoria.toLowerCase()">
+              <mat-icon aria-hidden="true">{{ iconaCategoria(categoria) }}</mat-icon>
+              {{ categoria | categoria }}
+              <span class="conteggio">{{ teamPerCategoria(categoria).length }}</span>
+            </h4>
+
+            <div class="griglia">
+              @for (team of teamPerCategoria(categoria); track team.id) {
+                <article class="scheda" [ngClass]="'accento-cat-' + categoria.toLowerCase()">
+                  <header class="scheda-testa">
+                    <div class="avatar" [ngClass]="'cat-' + categoria.toLowerCase()">
+                      <mat-icon aria-hidden="true">{{ iconaCategoria(categoria) }}</mat-icon>
+                    </div>
+                    <div class="scheda-identita">
+                      <strong>{{ team.name }}</strong>
+                      <span class="sottotitolo">Squadra operativa</span>
+                    </div>
+                  </header>
+
+                  <dl class="dettagli">
+                    <div>
+                      <dt>Categoria</dt>
+                      <dd>{{ team.category | categoria }}</dd>
+                    </div>
+                    <div>
+                      <dt>Membri</dt>
+                      <dd>{{ team.memberCount }}</dd>
+                    </div>
+                  </dl>
+
+                  @if (operatoriDelTeam(team.id).length > 0) {
+                    <div class="blocco-membri">
+                      <h5 class="titolo-campi">Operatori assegnati</h5>
+                      <ul class="elenco-membri">
+                        @for (operatore of operatoriDelTeam(team.id); track operatore.id) {
+                          <li><mat-icon aria-hidden="true">engineering</mat-icon> {{ operatore.username }}</li>
+                        }
+                      </ul>
+                    </div>
+                  }
+                </article>
               }
-            </tbody>
-          </table>
-        </div>
+            </div>
+          </section>
+        }
       </div>
     </mat-tab>
 
+    <!-- ---------------------------------------------------------------- -->
     <mat-tab label="Assegna segnalazioni">
       <div class="tab-content">
-        <div class="table-scroll">
-          <table class="admin-table">
-            <thead>
-            <tr><th scope="col">Titolo</th><th scope="col">Stato</th><th scope="col">Team assegnato</th><th scope="col">Assegna team</th><th scope="col">Operatore assegnato</th><th scope="col">Assegna operatore</th><th scope="col">Priorità</th></tr>
-            </thead>
-            <tbody>
-              @for (report of reports; track report.id) {
-                <tr>
-                  <td>{{ report.title }}</td>
-                  <td><span class="status-badge" [ngClass]="'status-' + report.status.toLowerCase()">{{ report.status }}</span></td>
-                  <td>{{ report.assignedTeamName ?? '—' }}</td>
-                  <td>
-                    @if (puoEssereAssegnata(report)) {
-                      <mat-form-field appearance="outline" class="inline-select">
-                        <mat-select [(ngModel)]="teamSceltoPerReport[report.id]">
-                          @for (team of teams; track team.id) {
-                            <mat-option [value]="team.id">{{ team.name }}</mat-option>
-                          }
-                        </mat-select>
-                      </mat-form-field>
-                      <button mat-button (click)="assegnaTeamReport(report)">Assegna</button>
-                    } @else {
-                      <span class="closed-hint">Segnalazione chiusa</span>
-                    }
-                  </td>
-                  <td>{{ report.assignedOperatorUsername ?? '—' }}</td>
-                  <td>
-                    @if (puoEssereAssegnata(report)) {
-                      <mat-form-field appearance="outline" class="inline-select">
-                        <mat-select [(ngModel)]="operatoreSceltoPerReport[report.id]">
-                          @for (operatore of operatori; track operatore.id) {
-                            <mat-option [value]="operatore.id">{{ operatore.username }}</mat-option>
-                          }
-                        </mat-select>
-                      </mat-form-field>
-                      <button mat-button (click)="assegnaOperatoreReport(report)">Assegna</button>
-                    } @else {
-                      <span class="closed-hint">—</span>
-                    }
-                  </td>
-                  <td>
-                    @if (puoEssereAssegnata(report)) {
-                      <mat-form-field appearance="outline" class="inline-select">
-                        <mat-select [(ngModel)]="prioritaSceltaPerReport[report.id]">
-                          @for (p of prioritaDisponibili; track p) {
-                            <mat-option [value]="p">{{ p }}</mat-option>
-                          }
-                        </mat-select>
-                      </mat-form-field>
-                      <button mat-button (click)="assegnaPriorita(report)">Assegna</button>
-                    } @else {
-                      <span class="priority-badge" [ngClass]="'priority-' + report.priority.toLowerCase()">{{ report.priority }}</span>
-                    }
-                  </td>
-                </tr>
+
+        @for (gruppo of gruppiAperti; track gruppo.titolo) {
+          <section class="gruppo">
+            <h4 class="gruppo-titolo">
+              <mat-icon aria-hidden="true">{{ gruppo.icona }}</mat-icon>
+              {{ gruppo.titolo }}
+              <span class="conteggio">{{ gruppo.reports.length }}</span>
+            </h4>
+
+            @if (gruppo.reports.length === 0) {
+              <p class="vuoto">Nessuna segnalazione in questo gruppo.</p>
+            }
+
+            <div class="griglia griglia-larga">
+              @for (report of gruppo.reports; track report.id) {
+                <article class="scheda scheda-assegna" [ngClass]="'accento-cat-' + report.category.toLowerCase()">
+
+                  <header class="scheda-testa">
+                    <div class="avatar" [ngClass]="'cat-' + report.category.toLowerCase()">
+                      <mat-icon aria-hidden="true">{{ iconaCategoria(report.category) }}</mat-icon>
+                    </div>
+                    <div class="scheda-identita">
+                      <strong>{{ report.title }}</strong>
+                      <span class="sottotitolo">{{ report.address || 'Indirizzo non indicato' }}</span>
+                    </div>
+                  </header>
+
+                  <dl class="dettagli">
+                    <div>
+                      <dt>Descrizione</dt>
+                      <dd class="descrizione">{{ report.description }}</dd>
+                    </div>
+                    <div>
+                      <dt>Categoria</dt>
+                      <dd>{{ report.category | categoria }}</dd>
+                    </div>
+                    <div>
+                      <dt>Stato</dt>
+                      <dd>
+                        <span class="status-badge" [ngClass]="'status-' + report.status.toLowerCase()">
+                          {{ report.status | stato }}
+                        </span>
+                      </dd>
+                    </div>
+                    <div>
+                      <dt>Urgenza</dt>
+                      <dd>
+                        <span class="priority-badge" [ngClass]="'priority-' + report.priority.toLowerCase()">
+                          {{ report.priority | priorita }}
+                        </span>
+                      </dd>
+                    </div>
+                    <div>
+                      <dt>Team</dt>
+                      <dd>{{ report.assignedTeamName ?? 'Non assegnato' }}</dd>
+                    </div>
+                    <div>
+                      <dt>Operatore</dt>
+                      <dd>{{ report.assignedOperatorUsername ?? 'Non assegnato' }}</dd>
+                    </div>
+                  </dl>
+
+                  <h5 class="titolo-campi">Modifica assegnazione</h5>
+
+                  <div class="campi-assegna">
+                    <mat-form-field appearance="outline" class="campo">
+                      <mat-label>Team</mat-label>
+                      <mat-select [(ngModel)]="teamSceltoPerReport[report.id]">
+                        @for (team of teams; track team.id) {
+                          <mat-option [value]="team.id">{{ team.name }}</mat-option>
+                        }
+                      </mat-select>
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline" class="campo">
+                      <mat-label>Operatore</mat-label>
+                      <mat-select [(ngModel)]="operatoreSceltoPerReport[report.id]">
+                        @for (operatore of operatoriDelTeam(teamSceltoPerReport[report.id]); track operatore.id) {
+                          <mat-option [value]="operatore.id">{{ operatore.username }}</mat-option>
+                        }
+                      </mat-select>
+                      <mat-hint>Solo operatori del team scelto</mat-hint>
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline" class="campo">
+                      <mat-label>Priorità</mat-label>
+                      <mat-select [(ngModel)]="prioritaSceltaPerReport[report.id]">
+                        @for (p of prioritaDisponibili; track p) {
+                          <mat-option [value]="p">{{ p | priorita }}</mat-option>
+                        }
+                      </mat-select>
+                    </mat-form-field>
+                  </div>
+
+                  <div class="scheda-piede">
+                    <button mat-flat-button color="primary"
+                            [disabled]="!haModifiche(report) || salvataggioPerReport[report.id]"
+                            (click)="salvaAssegnazioni(report)">
+                      {{ salvataggioPerReport[report.id] ? 'Salvataggio...' : 'Salva assegnazioni' }}
+                    </button>
+                  </div>
+
+                </article>
               }
-            </tbody>
-          </table>
-        </div>
+            </div>
+          </section>
+        }
+
+        @if (segnalazioniChiuse.length > 0) {
+          <section class="gruppo">
+            <h4 class="gruppo-titolo">
+              <mat-icon aria-hidden="true">lock</mat-icon>
+              Segnalazioni chiuse
+              <span class="conteggio">{{ segnalazioniChiuse.length }}</span>
+            </h4>
+
+            <div class="griglia">
+              @for (report of segnalazioniChiuse; track report.id) {
+                <article class="scheda scheda-chiusa" [ngClass]="'accento-cat-' + report.category.toLowerCase()">
+                  <header class="scheda-testa">
+                    <div class="avatar" [ngClass]="'cat-' + report.category.toLowerCase()">
+                      <mat-icon aria-hidden="true">{{ iconaCategoria(report.category) }}</mat-icon>
+                    </div>
+                    <div class="scheda-identita">
+                      <strong>{{ report.title }}</strong>
+                      <span class="sottotitolo">{{ report.address || 'Indirizzo non indicato' }}</span>
+                    </div>
+                  </header>
+
+                  <dl class="dettagli">
+                    <div>
+                      <dt>Categoria</dt>
+                      <dd>{{ report.category | categoria }}</dd>
+                    </div>
+                    <div>
+                      <dt>Esito</dt>
+                      <dd>
+                        <span class="status-badge" [ngClass]="'status-' + report.status.toLowerCase()">
+                          {{ report.status | stato }}
+                        </span>
+                      </dd>
+                    </div>
+                    <div>
+                      <dt>Urgenza</dt>
+                      <dd>
+                        <span class="priority-badge" [ngClass]="'priority-' + report.priority.toLowerCase()">
+                          {{ report.priority | priorita }}
+                        </span>
+                      </dd>
+                    </div>
+                    <div>
+                      <dt>Team</dt>
+                      <dd>{{ report.assignedTeamName ?? 'Non assegnato' }}</dd>
+                    </div>
+                  </dl>
+                </article>
+              }
+            </div>
+          </section>
+        }
       </div>
     </mat-tab>
 

@@ -15,6 +15,7 @@ import { Report, ReportPhoto, ReportStatus, Update } from '../../../core/models/
 import { Role } from '../../../core/models/user.model';
 import { ICONE_CATEGORIA } from '../../../core/constants/category-icons';
 import { segnapostoPerCategoria } from '../../../core/constants/map-marker';
+import { CategoriaPipe, PrioritaPipe, StatoPipe } from '../../../core/pipes/etichette.pipe';
 import { Component, ElementRef, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import * as L from 'leaflet';
 
@@ -25,7 +26,8 @@ const PHOTO_BASE_URL = 'http://localhost:8080';
   standalone: true,
   imports: [
     CommonModule, FormsModule, MatCardModule, MatChipsModule, MatButtonModule,
-    MatFormFieldModule, MatInputModule, MatSelectModule, MatProgressSpinnerModule, MatIconModule
+    MatFormFieldModule, MatInputModule, MatSelectModule, MatProgressSpinnerModule, MatIconModule,
+    StatoPipe, PrioritaPipe, CategoriaPipe
   ],
   templateUrl: './report-detail.component.html',
   styleUrl: './report-detail.component.scss'

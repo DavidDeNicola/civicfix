@@ -48,6 +48,8 @@
   --space-lg: 24px;
   --space-xl: 32px;
   --footer-height: 44px;
+  --rail-width: 72px;
+  --rail-width-expanded: 240px;
 }
 
 .dark-theme {
@@ -154,6 +156,21 @@ body.dark-theme {
   background-color: transparent !important;
 }
 
+// Da desktop la barra di navigazione si allarga sopra il contenuto al
+// passaggio del mouse. I contenitori interni della sidenav ritagliano i figli,
+// quindi il pannello esteso verrebbe tagliato a 72px: qui si toglie il
+// ritaglio solo dove serve, lasciando intatto lo scorrimento su mobile.
+@media (min-width: 769px) {
+  .sidebar.mat-drawer,
+  .sidebar .mat-drawer-inner-container {
+    overflow: visible;
+  }
+
+  .sidebar .mat-drawer-inner-container {
+    height: 100%;
+  }
+}
+
 // Visible, high-contrast focus ring for keyboard users on every interactive element.
 :focus-visible {
   outline: 3px solid var(--color-accent);
@@ -177,6 +194,48 @@ body.dark-theme {
   border: none;
   line-height: 0;
   filter: drop-shadow(0 2px 3px rgba(15, 23, 42, 0.4));
+}
+
+// --- Badge e tinte per categoria (condivisi) -----------------------------
+//
+// Le stesse pastiglie di stato/priorità/ruolo e i cerchietti colorati per
+// categoria comparivano identici in report-card, report-detail e nella
+// dashboard di amministrazione. Stanno qui una volta sola: sono classi
+// semplici, quindi continuano ad applicarsi dentro i componenti.
+
+$cf-categorie: viability, lighting, waste, green_areas, water, other;
+$cf-priorita: low, normal, high, urgent;
+$cf-ruoli: citizen, operator, admin;
+// La classe deriva dal valore enum (in_progress), il token CSS usa in-progress.
+$cf-stati: (pending: pending, in_progress: in-progress, resolved: resolved, rejected: rejected);
+
+.status-badge, .priority-badge, .role-badge {
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.3px;
+  display: inline-block;
+  white-space: nowrap;
+}
+
+@each $classe, $token in $cf-stati {
+  .status-#{$classe} { background: var(--status-#{$token}); }
+}
+@each $p in $cf-priorita {
+  .priority-#{$p} { background: var(--priority-#{$p}); }
+}
+@each $r in $cf-ruoli {
+  .role-#{$r} { background: var(--role-#{$r}); }
+}
+
+// Cerchietto icona categoria: sfondo tenue + icona nel colore pieno.
+@each $c in $cf-categorie {
+  .cat-#{$c} {
+    background: var(--cat-#{$c}-tint);
+    color: var(--cat-#{$c});
+  }
 }
 
 mat-card, .mat-mdc-card {

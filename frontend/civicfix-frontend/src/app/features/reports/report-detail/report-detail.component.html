@@ -15,8 +15,38 @@
       </div>
     </div>
 
-    <p class="description">{{ report.description }}</p>
-    <span class="status-badge" [ngClass]="'status-' + report.status.toLowerCase()">{{ report.status }}</span>
+    <dl class="meta">
+      <div class="meta-descrizione">
+        <dt>Descrizione</dt>
+        <dd class="description">{{ report.description }}</dd>
+      </div>
+      <div>
+        <dt>Stato</dt>
+        <dd>
+          <span class="status-badge" [ngClass]="'status-' + report.status.toLowerCase()">{{ report.status | stato }}</span>
+        </dd>
+      </div>
+      <div>
+        <dt>Urgenza</dt>
+        <dd>
+          <span class="priority-badge" [ngClass]="'priority-' + report.priority.toLowerCase()">{{ report.priority | priorita }}</span>
+        </dd>
+      </div>
+      <div>
+        <dt>Categoria</dt>
+        <dd>{{ report.category | categoria }}</dd>
+      </div>
+      <div>
+        <dt>Segnalata il</dt>
+        <dd>{{ report.createdAt | date:'dd/MM/yyyy' }}</dd>
+      </div>
+      @if (report.assignedTeamName) {
+        <div>
+          <dt>Team</dt>
+          <dd>{{ report.assignedTeamName }}</dd>
+        </div>
+      }
+    </dl>
 
     @if (photos.length > 0) {
       <div class="photo-gallery">
@@ -32,7 +62,7 @@
           <mat-label>Cambia stato</mat-label>
           <mat-select [(ngModel)]="nuovoStato">
             @for (stato of statiDisponibili; track stato) {
-              <mat-option [value]="stato">{{ stato }}</mat-option>
+              <mat-option [value]="stato">{{ stato | stato }}</mat-option>
             }
           </mat-select>
         </mat-form-field>
@@ -55,9 +85,9 @@
           <strong>{{ update.authorUsername }}</strong>
           @if (update.type === 'STATUS_CHANGE') {
             <span> ha cambiato lo stato da
-              <span class="status-badge small" [ngClass]="'status-' + update.oldStatus?.toLowerCase()">{{ update.oldStatus }}</span>
+              <span class="status-badge small" [ngClass]="'status-' + update.oldStatus?.toLowerCase()">{{ update.oldStatus | stato }}</span>
               a
-              <span class="status-badge small" [ngClass]="'status-' + update.newStatus?.toLowerCase()">{{ update.newStatus }}</span>
+              <span class="status-badge small" [ngClass]="'status-' + update.newStatus?.toLowerCase()">{{ update.newStatus | stato }}</span>
             </span>
           } @else {
             <p class="comment-text">{{ update.message }}</p>

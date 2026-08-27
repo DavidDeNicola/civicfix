@@ -18,7 +18,7 @@
       <mat-label>Categoria</mat-label>
       <mat-select [(ngModel)]="categoria">
         @for (cat of categorieDisponibili; track cat) {
-          <mat-option [value]="cat">{{ cat }}</mat-option>
+          <mat-option [value]="cat">{{ cat | categoria }}</mat-option>
         }
       </mat-select>
     </mat-form-field>

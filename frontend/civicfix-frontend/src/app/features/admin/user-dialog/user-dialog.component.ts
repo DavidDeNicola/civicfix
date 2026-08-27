@@ -8,6 +8,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { CreateUserRequest, Team } from '../../../core/models/admin.model';
 import { Role } from '../../../core/models/user.model';
+import { RuoloPipe } from '../../../core/pipes/etichette.pipe';
 
 export interface UserDialogData {
   teams: Team[];
@@ -18,7 +19,7 @@ export interface UserDialogData {
   standalone: true,
   imports: [
     CommonModule, FormsModule, MatDialogModule, MatFormFieldModule,
-    MatInputModule, MatSelectModule, MatButtonModule
+    MatInputModule, MatSelectModule, MatButtonModule, RuoloPipe
   ],
   templateUrl: './user-dialog.component.html',
   styleUrl: './user-dialog.component.scss'

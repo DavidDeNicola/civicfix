@@ -11,11 +11,12 @@ import { MatCardModule } from '@angular/material/card';
 import { ReportService } from '../../../core/services/report.service';
 import { CreateReportRequest, ReportCategory } from '../../../core/models/report.model';
 import { segnapostoPerCategoria } from '../../../core/constants/map-marker';
+import { CategoriaPipe } from '../../../core/pipes/etichette.pipe';
 
 @Component({
   selector: 'app-create-report',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatButtonModule, MatCardModule],
+  imports: [CommonModule, FormsModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatButtonModule, MatCardModule, CategoriaPipe],
   templateUrl: './create-report.component.html',
   styleUrl: './create-report.component.scss'
 })

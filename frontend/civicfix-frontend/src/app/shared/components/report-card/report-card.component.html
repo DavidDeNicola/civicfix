@@ -13,14 +13,35 @@
   <div class="card-main">
     <div class="card-title-row">
       <h3>{{ report.title }}</h3>
-      <span class="priority-badge" [ngClass]="'priority-' + report.priority.toLowerCase()">{{ report.priority }}</span>
     </div>
     <span class="address"><mat-icon aria-hidden="true" class="inline-icon">place</mat-icon> {{ report.address }}</span>
-    <p class="description">{{ report.description }}</p>
-    <div class="card-footer">
-      <span class="status-badge" [ngClass]="'status-' + report.status.toLowerCase()">{{ report.status }}</span>
-      <span class="date">{{ report.createdAt | date:'dd/MM/yyyy' }}</span>
-    </div>
+
+    <dl class="meta">
+      <div class="meta-descrizione">
+        <dt>Descrizione</dt>
+        <dd class="description">{{ report.description }}</dd>
+      </div>
+      <div>
+        <dt>Stato</dt>
+        <dd>
+          <span class="status-badge" [ngClass]="'status-' + report.status.toLowerCase()">{{ report.status | stato }}</span>
+        </dd>
+      </div>
+      <div>
+        <dt>Urgenza</dt>
+        <dd>
+          <span class="priority-badge" [ngClass]="'priority-' + report.priority.toLowerCase()">{{ report.priority | priorita }}</span>
+        </dd>
+      </div>
+      <div>
+        <dt>Categoria</dt>
+        <dd>{{ report.category | categoria }}</dd>
+      </div>
+      <div>
+        <dt>Data</dt>
+        <dd>{{ report.createdAt | date:'dd/MM/yyyy' }}</dd>
+      </div>
+    </dl>
   </div>
 
   <div class="mini-map" #miniMap></div>

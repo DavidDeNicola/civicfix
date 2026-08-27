@@ -10,11 +10,15 @@ import { AuthService } from '../../../core/services/auth.service';
 import { Report, ReportCategory, ReportStatus } from '../../../core/models/report.model';
 import { Role } from '../../../core/models/user.model';
 import { ReportCardComponent } from '../../../shared/components/report-card/report-card.component';
+import { CategoriaPipe, StatoPipe } from '../../../core/pipes/etichette.pipe';
 
 @Component({
   selector: 'app-reports-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, MatProgressSpinnerModule, MatCheckboxModule, MatIconModule, ReportCardComponent],
+  imports: [
+    CommonModule, FormsModule, RouterLink, MatProgressSpinnerModule, MatCheckboxModule,
+    MatIconModule, ReportCardComponent, StatoPipe, CategoriaPipe
+  ],
   templateUrl: './reports-list.component.html',
   styleUrl: './reports-list.component.scss'
 })

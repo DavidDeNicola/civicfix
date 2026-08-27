@@ -30,7 +30,7 @@
     <mat-label>Ruolo</mat-label>
     <mat-select [(ngModel)]="utente.role" name="role">
       @for (ruolo of ruoliDisponibili; track ruolo) {
-        <mat-option [value]="ruolo">{{ ruolo }}</mat-option>
+        <mat-option [value]="ruolo">{{ ruolo | ruolo }}</mat-option>
       }
     </mat-select>
   </mat-form-field>

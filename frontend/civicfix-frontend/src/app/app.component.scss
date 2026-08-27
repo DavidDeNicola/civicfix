@@ -35,6 +35,19 @@
   box-shadow: 2px 0 16px rgba(15, 23, 42, 0.06);
   z-index: 2;
 }
+
+// Da desktop la sidenav occupa solo la larghezza della barra a icone: il
+// pannello esteso viene disegnato sopra il contenuto (vedi navbar.scss).
+@media (min-width: 769px) {
+  .sidebar {
+    width: var(--rail-width);
+    // Sfondo e bordo li disegna il pannello interno, che è l'elemento che
+    // si allarga: qui resterebbero fermi a 72px.
+    background-color: transparent;
+    border-right: none !important;
+    box-shadow: none;
+  }
+}
 .content-area {
   padding: var(--space-xl);
   box-sizing: border-box;

@@ -1,21 +1,24 @@
 <div class="sidebar-content">
   <a routerLink="/" class="brand" aria-label="CivicFix, vai alla home" (click)="linkActivated.emit()">
     <mat-icon class="brand-icon" aria-hidden="true">location_city</mat-icon>
-    <span class="brand-name">CivicFix</span>
+    <span class="etichetta brand-name">CivicFix</span>
   </a>
 
   <nav class="nav-links">
     <a routerLink="/reports" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-link" (click)="linkActivated.emit()">
-      <mat-icon aria-hidden="true">list_alt</mat-icon> Segnalazioni
+      <mat-icon aria-hidden="true">list_alt</mat-icon>
+      <span class="etichetta">Segnalazioni</span>
     </a>
     @if (authService.role === 'CITIZEN') {
       <a routerLink="/reports/new" routerLinkActive="active" class="nav-link" (click)="linkActivated.emit()">
-        <mat-icon aria-hidden="true">add_circle</mat-icon> Nuova segnalazione
+        <mat-icon aria-hidden="true">add_circle</mat-icon>
+        <span class="etichetta">Nuova segnalazione</span>
       </a>
     }
     @if (authService.role === 'ADMIN') {
       <a routerLink="/admin" routerLinkActive="active" class="nav-link" (click)="linkActivated.emit()">
-        <mat-icon aria-hidden="true">admin_panel_settings</mat-icon> Gestione
+        <mat-icon aria-hidden="true">admin_panel_settings</mat-icon>
+        <span class="etichetta">Gestione</span>
       </a>
     }
   </nav>
@@ -23,14 +26,16 @@
   <div class="sidebar-spacer"></div>
 
   <div class="sidebar-footer">
-    <button mat-icon-button [attr.aria-label]="themeService.isDarkTheme ? 'Attiva tema chiaro' : 'Attiva tema scuro'" (click)="themeService.toggleTheme()">
+    <button mat-icon-button class="azione-footer"
+            [attr.aria-label]="themeService.isDarkTheme ? 'Attiva tema chiaro' : 'Attiva tema scuro'"
+            (click)="themeService.toggleTheme()">
       <mat-icon aria-hidden="true">{{ themeService.isDarkTheme ? 'light_mode' : 'dark_mode' }}</mat-icon>
     </button>
-    <div class="user-info">
+    <div class="user-info etichetta">
       <span class="username">{{ authService.username }}</span>
-      <span class="role">{{ authService.role }}</span>
+      <span class="role">{{ authService.role | ruolo }}</span>
     </div>
-    <button mat-icon-button aria-label="Esci" (click)="logout()">
+    <button mat-icon-button class="azione-footer etichetta" aria-label="Esci" (click)="logout()">
       <mat-icon aria-hidden="true">logout</mat-icon>
     </button>
   </div>

@@ -23,24 +23,44 @@
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
 }
-.cat-viability   { background: var(--cat-viability-tint); color: var(--cat-viability); }
-.cat-lighting    { background: var(--cat-lighting-tint); color: var(--cat-lighting); }
-.cat-waste       { background: var(--cat-waste-tint); color: var(--cat-waste); }
-.cat-green_areas { background: var(--cat-green_areas-tint); color: var(--cat-green_areas); }
-.cat-water       { background: var(--cat-water-tint); color: var(--cat-water); }
-.cat-other       { background: var(--cat-other-tint); color: var(--cat-other); }
+// Le tinte .cat-* sono definite una volta sola in styles.scss.
 
-.description { color: var(--color-foreground); margin-bottom: 16px; }
-
-.status-badge {
-  padding: 4px 12px; border-radius: 999px; font-size: 0.72rem;
-  font-weight: 700; color: #fff; letter-spacing: 0.3px; display: inline-block;
+// Stessa impaginazione etichetta/valore della card in elenco, così i due
+// livelli di lettura si corrispondono.
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 22px;
+  margin: 0 0 4px;
 }
+.meta > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.meta-descrizione { flex: 1 0 100%; }
+
+.meta dt {
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-muted-foreground);
+}
+.meta dd {
+  margin: 0;
+  font-size: 0.92rem;
+  color: var(--color-foreground);
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+
+.description { color: var(--color-foreground); }
+
+// Badge di stato e priorità: stili condivisi in styles.scss.
+
 .status-badge.small { padding: 2px 9px; font-size: 0.65rem; margin: 0 3px; }
-.status-pending     { background: var(--status-pending); }
-.status-in_progress { background: var(--status-in-progress); }
-.status-resolved    { background: var(--status-resolved); }
-.status-rejected    { background: var(--status-rejected); }
 
 .photo-gallery { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
 .photo-gallery img { width: 150px; height: 150px; object-fit: cover; border-radius: var(--radius-md); }
