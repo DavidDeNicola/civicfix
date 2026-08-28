@@ -8,6 +8,9 @@ import org.civicfix.app.model.Team;
 import org.civicfix.app.model.User;
 import org.springframework.stereotype.Component;
 
+/** Conversione fra l'entità User e i suoi DTO (creazione, risposta). */
+
+
 @Component
 public class UserMapper {
 
