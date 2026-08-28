@@ -1,7 +1,9 @@
 package org.civicfix.app.mapper;
 
 import org.civicfix.app.dto.CreateUserRequest;
+import org.civicfix.app.dto.RegisterRequest;
 import org.civicfix.app.dto.UserResponse;
+import org.civicfix.app.model.Role;
 import org.civicfix.app.model.Team;
 import org.civicfix.app.model.User;
 import org.springframework.stereotype.Component;
@@ -33,6 +35,21 @@ public class UserMapper {
         user.setFullName(request.fullName());
         user.setRole(request.role());
         user.setTeam(team);
+        return user;
+    }
+
+    /**
+     * Variante per la registrazione pubblica, che ha meno campi: il ruolo non
+     * è nella richiesta ma lo decide il service, così la regola "chi si
+     * registra è sempre un cittadino" resta visibile lì e non qui.
+     */
+    public User toEntity(RegisterRequest request, String passwordHash, Role role) {
+        User user = new User();
+        user.setUsername(request.username());
+        user.setEmail(request.email());
+        user.setPasswordHash(passwordHash);
+        user.setFullName(request.fullName());
+        user.setRole(role);
         return user;
     }
 }

@@ -2,8 +2,10 @@ package org.civicfix.app.service;
 
 import lombok.RequiredArgsConstructor;
 import org.civicfix.app.dto.CreateUserRequest;
+import org.civicfix.app.dto.RegisterRequest;
 import org.civicfix.app.dto.UserResponse;
 import org.civicfix.app.mapper.UserMapper;
+import org.civicfix.app.model.Role;
 import org.civicfix.app.model.Team;
 import org.civicfix.app.model.User;
 import org.civicfix.app.repository.TeamRepository;
@@ -28,12 +30,7 @@ public class UserService {
     private final UserMapper userMapper;
 
     public UserResponse createUser(CreateUserRequest request){
-        if(userRepository.existsByUsername(request.username())){
-            throw new IllegalArgumentException("Username già in uso");
-        }
-        if(userRepository.existsByEmail(request.email())){
-            throw new IllegalArgumentException("Email già in uso");
-        }
+        verificaUnicita(request.username(), request.email());
 
         Team team = null;
         if(request.teamId() != null){
@@ -43,6 +40,32 @@ public class UserService {
         User user = userMapper.toEntity(request, passwordEncoder.encode(request.password()), team);
 
         return userMapper.toResponse(userRepository.save(user));
+    }
+
+    /**
+     * Registrazione pubblica. Il ruolo è deciso qui e non accettato dal client:
+     * altrimenti chiunque potrebbe registrarsi come amministratore.
+     * Restituisce l'entità e non il DTO perché AuthService deve emettere il
+     * token, che si firma sull'utente.
+     */
+    public User creaCittadino(RegisterRequest request){
+        verificaUnicita(request.username(), request.email());
+
+        User user = userMapper.toEntity(request, passwordEncoder.encode(request.password()), Role.CITIZEN);
+        return userRepository.save(user);
+    }
+
+    /**
+     * Il vincolo di unicità sul database resta la garanzia ultima; qui si
+     * intercetta prima per rispondere con un messaggio comprensibile.
+     */
+    private void verificaUnicita(String username, String email){
+        if(userRepository.existsByUsername(username)){
+            throw new IllegalArgumentException("Username già in uso");
+        }
+        if(userRepository.existsByEmail(email)){
+            throw new IllegalArgumentException("Email già in uso");
+        }
     }
 
     public List<UserResponse> getAllUsers(){
