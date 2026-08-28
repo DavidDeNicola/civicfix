@@ -14,6 +14,12 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
+
+/**
+ * Voce della cronologia di una segnalazione: un commento oppure un cambio di stato.
+ * Se è un cambio di stato, oldStatus/newStatus tracciano il prima e il dopo.
+ */
+
 public class Update {
 
     @Id

@@ -29,6 +29,14 @@ import java.util.List;
 @EnableWebSecurity
 @EnableMethodSecurity // abilita @PreAuthorize sui metodi/controller
 @RequiredArgsConstructor
+
+/**
+ * Configura Spring Security: JWT al posto della sessione (STATELESS), CSRF
+ * disattivato (non serve senza sessione/cookie), CORS ristretto al frontend
+ * Angular, endpoint pubblici (auth, GET reports, foto, swagger) elencati
+ * esplicitamente, il resto richiede autenticazione.
+ */
+
 public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;

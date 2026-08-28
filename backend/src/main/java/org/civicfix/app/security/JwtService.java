@@ -13,6 +13,14 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 @Service
+
+/**
+ * Genera e valida i token JWT. Nel payload porta anche ruolo e id utente,
+ * letti dal frontend con jwt-decode senza chiamare il backend — ma
+ * l'autorizzazione lato server si basa sempre sull'utente ricaricato dal DB,
+ * non sui claim del token.
+ */
+
 public class JwtService {
 
     @Value("${jwt.secret}")
@@ -44,17 +52,22 @@ public class JwtService {
                 .getPayload();
     }
 
-    public String extractUsername(String token){
-        return extractAllClaims(token).getSubject();
-    }
+
 
     public boolean isTokenValid(String token, UserDetails userDetails){
         String username = extractUsername(token);
         return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
     }
 
+
+    // metodo di utilità per 'isTokenValid()'
     public boolean isTokenExpired(String token){
         return extractAllClaims(token).getExpiration().before(new Date());
+    }
+
+    // metodo di utilità per 'isTokenValid()'
+    public String extractUsername(String token){
+        return extractAllClaims(token).getSubject();
     }
 
 

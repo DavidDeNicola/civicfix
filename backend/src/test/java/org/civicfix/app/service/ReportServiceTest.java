@@ -2,6 +2,9 @@ package org.civicfix.app.service;
 
 import org.civicfix.app.dto.CreateReportRequest;
 import org.civicfix.app.dto.ReportResponse;
+import org.civicfix.app.mapper.ReportMapper;
+import org.civicfix.app.mapper.ReportPhotoMapper;
+import org.civicfix.app.mapper.UpdateMapper;
 import org.civicfix.app.model.*;
 import org.civicfix.app.repository.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.access.AccessDeniedException;
 
@@ -36,6 +40,12 @@ class ReportServiceTest {
     @Mock private ReportPhotoRepository reportPhotoRepository;
     @Mock private VoteRepository voteRepository;
     @Mock private MailService mailService;
+
+    // I mapper sono logica pura senza dipendenze: usarli davvero invece di
+    // simularli mantiene le asserzioni sulla risposta effettivamente utili.
+    @Spy private ReportMapper reportMapper = new ReportMapper();
+    @Spy private UpdateMapper updateMapper = new UpdateMapper();
+    @Spy private ReportPhotoMapper reportPhotoMapper = new ReportPhotoMapper();
 
     @InjectMocks
     private ReportService reportService;
@@ -216,5 +226,37 @@ class ReportServiceTest {
         ReportResponse esito = reportService.assignOperator(ID_SEGNALAZIONE, ID_OPERATORE_ASSEGNATO);
 
         assertThat(esito.assignedOperatorUsername()).isEqualTo(operatoreAssegnato.getUsername());
+    }
+
+    /**
+     * Le operazioni di gestione devono restituire il conteggio reale dei
+     * sostegni: la dashboard rimpiazza la segnalazione in elenco con questa
+     * risposta, quindi uno zero di comodo la farebbe apparire senza sostegni
+     * fino al ricaricamento della pagina.
+     */
+    @Test
+    void assegnareUnaSegnalazioneNonAzzeraIlConteggioDeiSostegni() {
+        Team team = new Team();
+        team.setId(1L);
+
+        when(reportRepository.findById(ID_SEGNALAZIONE)).thenReturn(Optional.of(segnalazione));
+        when(teamRepository.findById(1L)).thenReturn(Optional.of(team));
+        when(reportRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+        when(voteRepository.countByReportId(ID_SEGNALAZIONE)).thenReturn(7L);
+
+        assertThat(reportService.assignTeam(ID_SEGNALAZIONE, 1L).voteCount()).isEqualTo(7L);
+    }
+
+    @Test
+    void cambiareStatoNonAzzeraIlConteggioDeiSostegni() {
+        when(reportRepository.findById(ID_SEGNALAZIONE)).thenReturn(Optional.of(segnalazione));
+        when(userRepository.findById(ID_OPERATORE_ASSEGNATO)).thenReturn(Optional.of(operatoreAssegnato));
+        when(reportRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+        when(voteRepository.countByReportId(ID_SEGNALAZIONE)).thenReturn(4L);
+
+        ReportResponse esito = reportService.changeStatus(
+                ID_SEGNALAZIONE, ReportStatus.RESOLVED, null, ID_OPERATORE_ASSEGNATO);
+
+        assertThat(esito.voteCount()).isEqualTo(4L);
     }
 }

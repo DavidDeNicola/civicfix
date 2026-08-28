@@ -16,6 +16,12 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
+
+/**
+ * Squadra di operatori specializzata in una categoria di segnalazioni.
+ * Le segnalazioni si assegnano prima al team, poi a un singolo operatore del team.
+ */
+
 public class Team {
 
     @Id

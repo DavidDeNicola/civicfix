@@ -13,6 +13,12 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
+
+/**
+ * Voto di un cittadino su una segnalazione di un altro utente ("interessa anche a me").
+ * Il vincolo unico su (report_id, user_id) impedisce voti doppi.
+ */
+
 public class Vote {
 
     @Id

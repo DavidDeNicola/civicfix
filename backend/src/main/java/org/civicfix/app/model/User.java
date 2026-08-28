@@ -12,6 +12,12 @@ import org.hibernate.annotations.CreationTimestamp;
 @Getter
 @Setter
 @NoArgsConstructor
+
+/**
+ * Utente della piattaforma: cittadino, operatore comunale o admin.
+ * Il campo role determina i permessi; se operatore, è collegato a un Team.
+ */
+
 public class User {
 
     @Id

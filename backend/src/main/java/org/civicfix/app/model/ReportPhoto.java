@@ -14,6 +14,12 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
+
+/**
+ * Foto allegata a una segnalazione. Il file sta sul filesystem del server,
+ * qui si salva solo il percorso (filePath).
+ */
+
 public class ReportPhoto {
 
     @Id

@@ -3,6 +3,7 @@ package org.civicfix.app.service;
 import lombok.RequiredArgsConstructor;
 import org.civicfix.app.dto.CreateUserRequest;
 import org.civicfix.app.dto.UserResponse;
+import org.civicfix.app.mapper.UserMapper;
 import org.civicfix.app.model.Team;
 import org.civicfix.app.model.User;
 import org.civicfix.app.repository.TeamRepository;
@@ -12,6 +13,11 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/**
+ * Creazione e gestione utenti lato admin: valida unicità di username/email,
+ * hasha la password e collega opzionalmente un team.
+ */
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -19,6 +25,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final TeamRepository teamRepository;
     private final PasswordEncoder passwordEncoder;
+    private final UserMapper userMapper;
 
     public UserResponse createUser(CreateUserRequest request){
         if(userRepository.existsByUsername(request.username())){
@@ -28,23 +35,18 @@ public class UserService {
             throw new IllegalArgumentException("Email già in uso");
         }
 
-        User user = new User();
-        user.setUsername(request.username());
-        user.setEmail(request.email());
-        user.setPasswordHash(passwordEncoder.encode(request.password()));
-        user.setFullName(request.fullName());
-        user.setRole(request.role());
-
+        Team team = null;
         if(request.teamId() != null){
-            Team team = teamRepository.findById(request.teamId()).orElseThrow(() -> new IllegalArgumentException("Team non trovato"));
-            user.setTeam(team);
+            team = teamRepository.findById(request.teamId()).orElseThrow(() -> new IllegalArgumentException("Team non trovato"));
         }
 
-        return UserResponse.from(userRepository.save(user));
+        User user = userMapper.toEntity(request, passwordEncoder.encode(request.password()), team);
+
+        return userMapper.toResponse(userRepository.save(user));
     }
 
     public List<UserResponse> getAllUsers(){
-        return userRepository.findAll().stream().map(UserResponse::from).toList();
+        return userRepository.findAll().stream().map(userMapper::toResponse).toList();
     }
 
     public UserResponse assignTeam(Long userId, Long teamId) {
@@ -54,6 +56,6 @@ public class UserService {
                 .orElseThrow(() -> new IllegalArgumentException("Team non trovato"));
 
         user.setTeam(team);
-        return UserResponse.from(userRepository.save(user));
+        return userMapper.toResponse(userRepository.save(user));
     }
 }

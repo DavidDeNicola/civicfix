@@ -2,6 +2,9 @@ package org.civicfix.app.service;
 
 import lombok.RequiredArgsConstructor;
 import org.civicfix.app.dto.*;
+import org.civicfix.app.mapper.ReportMapper;
+import org.civicfix.app.mapper.ReportPhotoMapper;
+import org.civicfix.app.mapper.UpdateMapper;
 import org.civicfix.app.model.*;
 import org.civicfix.app.repository.*;
 import org.civicfix.app.repository.specification.ReportSpecifications;
@@ -24,6 +27,13 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+
+/**
+ * Cuore del dominio: crea, modifica, assegna e cambia stato alle segnalazioni.
+ * Le regole di autorizzazione (solo l'autore, solo se PENDING, solo l'operatore
+ * assegnato o un admin) vivono qui, non nel controller.
+ */
+
 @Service
 @RequiredArgsConstructor
 public class ReportService {
@@ -36,22 +46,19 @@ public class ReportService {
     private final ReportPhotoRepository reportPhotoRepository;
     private final VoteRepository voteRepository;
     private final MailService mailService;
+    private final ReportMapper reportMapper;
+    private final UpdateMapper updateMapper;
+    private final ReportPhotoMapper reportPhotoMapper;
 
     public ReportResponse createReport(CreateReportRequest request, Long reporterId) {
         User reporter = userRepository.findById(reporterId)
                 .orElseThrow(() -> new IllegalArgumentException("Utente non trovato"));
 
-        Report report = new Report();
-        report.setTitle(request.title());
-        report.setDescription(request.description());
-        report.setCategory(request.category());
-        report.setLatitude(request.latitude());
-        report.setLongitude(request.longitude());
-        report.setAddress(request.address());
-        report.setReporter(reporter);
-        // status resta PENDING di default, come impostato nell'entità
+        Report report = reportMapper.toEntity(request, reporter);
 
-        return ReportResponse.from(reportRepository.save(report));
+        // Appena creata non può avere sostegni: qui lo zero è un dato di fatto,
+        // non un valore mancante.
+        return reportMapper.toResponse(reportRepository.save(report), 0L, false);
     }
 
     public ReportResponse getById(Long id, Long currentUserId) {
@@ -61,7 +68,7 @@ public class ReportService {
         long voti = voteRepository.countByReportId(id);
         boolean votata = currentUserId != null && voteRepository.existsByReportIdAndUserId(id, currentUserId);
 
-        return ReportResponse.from(report, voti, votata);
+        return reportMapper.toResponse(report, voti, votata);
     }
 
     public PagedResponse<ReportResponse> searchReports(
@@ -97,7 +104,7 @@ public class ReportService {
         Set<Long> votate = (currentUserId == null || ids.isEmpty()) ? Set.of()
                 : new HashSet<>(voteRepository.segnalazioniVotateDa(currentUserId, ids));
 
-        Page<ReportResponse> result = pagina.map(report -> ReportResponse.from(
+        Page<ReportResponse> result = pagina.map(report -> reportMapper.toResponse(
                 report,
                 conteggi.getOrDefault(report.getId(), 0L),
                 votate.contains(report.getId())));
@@ -114,16 +121,12 @@ public class ReportService {
     @Transactional
     public ReportResponse updateReport(Long reportId, CreateReportRequest request, Long currentUserId) {
         Report report = caricaModificabile(reportId, currentUserId);
-
-        report.setTitle(request.title());
-        report.setDescription(request.description());
-        report.setCategory(request.category());
-        report.setLatitude(request.latitude());
-        report.setLongitude(request.longitude());
-        report.setAddress(request.address());
+        reportMapper.applicaModifiche(report, request);
 
         Report salvata = reportRepository.save(report);
-        return ReportResponse.from(salvata, voteRepository.countByReportId(reportId), false);
+        // Chi modifica è l'autore, e l'autore non può sostenere la propria
+        // segnalazione (regola applicata da VoteService): quindi mai votata.
+        return reportMapper.toResponse(salvata, voteRepository.countByReportId(reportId), false);
     }
 
     @Transactional
@@ -141,6 +144,18 @@ public class ReportService {
         }
 
         reportRepository.delete(report);
+    }
+
+    /**
+     * Risposta per le operazioni lato gestione (assegnazione team/operatore,
+     * priorità). Il conteggio dei sostegni va riletto: la dashboard sostituisce
+     * la segnalazione in elenco con questa risposta, quindi restituire zero la
+     * farebbe apparire senza sostegni fino al ricaricamento della pagina.
+     * Il flag "votata dall'utente corrente" resta invece false perché qui
+     * l'utente è un amministratore, non il cittadino a cui serve quel dato.
+     */
+    private ReportResponse rispostaDiGestione(Report report) {
+        return reportMapper.toResponse(report, voteRepository.countByReportId(report.getId()), false);
     }
 
     private Report caricaModificabile(Long reportId, Long currentUserId) {
@@ -169,7 +184,7 @@ public class ReportService {
             report.setStatus(ReportStatus.IN_PROGRESS);
         }
 
-        return ReportResponse.from(reportRepository.save(report));
+        return rispostaDiGestione(reportRepository.save(report));
     }
 
     public ReportResponse assignOperator(Long reportId, Long operatorId) {
@@ -186,7 +201,7 @@ public class ReportService {
         }
 
         report.setAssignedOperator(operator);
-        return ReportResponse.from(reportRepository.save(report));
+        return rispostaDiGestione(reportRepository.save(report));
     }
 
     public ReportResponse changeStatus(Long reportId, ReportStatus newStatus, String message, Long currentUserId) {
@@ -223,7 +238,12 @@ public class ReportService {
         // qualcosa si è mosso senza tornare a controllare da solo.
         mailService.inviaCambioStato(report, oldStatus, newStatus, message);
 
-        return ReportResponse.from(report);
+        // Qui l'utente corrente è noto (operatore o admin) e può aver sostenuto
+        // la segnalazione in passato: il flag si può valorizzare davvero.
+        return reportMapper.toResponse(
+                report,
+                voteRepository.countByReportId(reportId),
+                voteRepository.existsByReportIdAndUserId(reportId, currentUserId));
     }
 
     public UpdateResponse addComment(Long reportId, String message, Long currentUserId) {
@@ -238,12 +258,12 @@ public class ReportService {
         update.setType(UpdateType.COMMENT);
         update.setMessage(message);
 
-        return UpdateResponse.from(updateRepository.save(update));
+        return updateMapper.toResponse(updateRepository.save(update));
     }
 
     public List<UpdateResponse> getUpdates(Long reportId) {
         return updateRepository.findByReportIdOrderByCreatedAtAsc(reportId)
-                .stream().map(UpdateResponse::from).toList();
+                .stream().map(updateMapper::toResponse).toList();
     }
 
     public ReportPhotoResponse uploadPhoto(Long reportId, MultipartFile file, Long currentUserId) {
@@ -260,12 +280,12 @@ public class ReportService {
         photo.setReport(report);
         photo.setFilePath(filename);
 
-        return ReportPhotoResponse.from(reportPhotoRepository.save(photo));
+        return reportPhotoMapper.toResponse(reportPhotoRepository.save(photo));
     }
 
     public List<ReportPhotoResponse> getPhotos(Long reportId) {
         return reportPhotoRepository.findByReportId(reportId)
-                .stream().map(ReportPhotoResponse::from).toList();
+                .stream().map(reportPhotoMapper::toResponse).toList();
     }
 
     public ReportResponse assignPriority(Long reportId, ReportPriority priority) {
@@ -273,7 +293,7 @@ public class ReportService {
                 .orElseThrow(() -> new IllegalArgumentException("Segnalazione non trovata"));
         report.setPriority(priority);
         reportRepository.save(report);
-        return ReportResponse.from(report);
+        return rispostaDiGestione(report);
     }
 }
 

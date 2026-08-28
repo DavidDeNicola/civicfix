@@ -10,6 +10,12 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+
+/**
+ * Punto in cui Spring Security recupera l'utente da autenticare: cerca per
+ * username e lo incapsula in un CustomUserDetails.
+ */
+
 public class CustomUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;

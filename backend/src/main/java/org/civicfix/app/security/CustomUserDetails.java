@@ -9,8 +9,15 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * Adatta la nostra entità User all'interfaccia UserDetails richiesta da Spring Security.
+ * Il ruolo viene esposto come GrantedAuthority con prefisso "ROLE_" (convenzione di Spring).
+ */
+
 public class CustomUserDetails implements UserDetails {
+
     private final User user;
+
 
     public CustomUserDetails(User user) {
         this.user = user;

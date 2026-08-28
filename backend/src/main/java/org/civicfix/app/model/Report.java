@@ -17,6 +17,13 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
+
+/**
+ * Segnalazione di degrado urbano creata da un cittadino.
+ * Contiene posizione (lat/lng), stato del workflow (PENDING → IN_PROGRESS → RESOLVED/REJECTED),
+ * team/operatore assegnati, foto e cronologia aggiornamenti.
+ */
+
 public class Report {
 
     @Id
