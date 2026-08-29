@@ -3,6 +3,11 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AdminUser, CreateUserRequest, CreateTeamRequest, Team, Statistics } from '../models/admin.model';
 
+/**
+ * Chiamate HTTP per la sezione admin: gestione utenti, team e statistiche.
+ * Come ReportService, sono solo wrapper verso il backend.
+ */
+
 const USERS_URL = 'http://localhost:8080/api/admin/users';
 const TEAMS_URL = 'http://localhost:8080/api/admin/teams';
 const STATISTICS_URL = 'http://localhost:8080/api/admin/statistics';

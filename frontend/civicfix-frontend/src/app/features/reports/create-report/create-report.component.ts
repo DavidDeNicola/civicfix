@@ -15,6 +15,13 @@ import { CreateReportRequest, ReportCategory } from '../../../core/models/report
 import { segnapostoPerCategoria } from '../../../core/constants/map-marker';
 import { CategoriaPipe } from '../../../core/pipes/etichette.pipe';
 
+/**
+ * Form di creazione/modifica di una segnalazione, con mappa Leaflet per
+ * scegliere la posizione e geocoding per convertire testo ↔ coordinate.
+ * Lo stesso componente serve sia "nuova segnalazione" sia "modifica":
+ * a distinguerli è idInModifica, valorizzato solo se la rotta contiene un id.
+ */
+
 @Component({
   selector: 'app-create-report',
   standalone: true,
@@ -61,10 +68,16 @@ export class CreateReportComponent implements OnInit, AfterViewInit, OnDestroy {
     private route: ActivatedRoute
   ) {}
 
+  /** Vero solo sulla rotta di modifica (idInModifica valorizzato in ngOnInit). */
   get inModifica(): boolean {
     return this.idInModifica !== null;
   }
 
+  /**
+   * Se la rotta contiene un id (rotta di modifica), lo legge dai parametri
+   * e precarica la segnalazione esistente per riempire il form. Se manca,
+   * il form resta vuoto: siamo nel caso "nuova segnalazione".
+   */
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
     if (!id) return;
@@ -91,15 +104,25 @@ export class CreateReportComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
+  /**
+   * Il contenitore della mappa esiste solo dopo che Angular ha renderizzato
+   * il template: per questo Leaflet si inizializza qui e non in ngOnInit.
+   */
   ngAfterViewInit(): void {
     this.inizializzaMappa();
   }
 
+  /** Libera mappa e observer alla distruzione del componente, per non lasciare listener orfani. */
   ngOnDestroy(): void {
     this.resizeObserver?.disconnect();
     this.map?.remove();
   }
 
+  /**
+   * Crea la mappa centrata su Lecce, aggiunge le tile OpenStreetMap e
+   * collega il click sulla mappa sia a impostaPosizione (segnaposto) sia
+   * alla geocodifica inversa (riempie l'indirizzo in automatico).
+   */
   private inizializzaMappa(): void {
     this.map = L.map(this.mapContainer.nativeElement).setView([40.3515, 18.1750], 13);
 
@@ -112,11 +135,17 @@ export class CreateReportComponent implements OnInit, AfterViewInit, OnDestroy {
       this.geocodificaInversa(event.latlng.lat, event.latlng.lng);
     });
 
-    // Keep Leaflet's cached pixel offsets in sync with responsive layout changes.
-    this.resizeObserver = new ResizeObserver(() => this.map?.invalidateSize());
-    this.resizeObserver.observe(this.mapContainer.nativeElement);
+// Mantiene sincronizzati gli offset in pixel di Leaflet con i cambi di layout responsive.    this.resizeObserver = new ResizeObserver(() => this.map?.invalidateSize());
+    const resizeObserver = new ResizeObserver(() => this.map?.invalidateSize());
+    resizeObserver.observe(this.mapContainer.nativeElement);
+    this.resizeObserver = resizeObserver;
   }
 
+  /**
+   * Aggiorna le coordinate del form e il segnaposto sulla mappa: se esiste
+   * già lo sposta, altrimenti lo crea la prima volta. Usata sia dal click
+   * sulla mappa sia dalla scelta di un risultato di ricerca indirizzo.
+   */
   private impostaPosizione(lat: number, lng: number): void {
     this.latitudine = lat;
     this.longitudine = lng;
@@ -130,6 +159,10 @@ export class CreateReportComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  /**
+   * Cerca l'indirizzo digitato dall'utente e popola risultatiIndirizzo con
+   * i candidati: la scelta finale avviene con scegliRisultato.
+   */
   cercaIndirizzo(): void {
     const testo = this.indirizzo.trim();
     if (!testo || this.ricercaIndirizzoInCorso) return;
@@ -148,6 +181,12 @@ export class CreateReportComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
+
+  /**
+   * L'utente conferma uno dei risultati proposti: riempie l'indirizzo,
+   * svuota l'elenco dei candidati e sposta mappa e segnaposto sulla
+   * posizione scelta.
+   */
   scegliRisultato(risultato: RisultatoGeocoding): void {
     this.indirizzo = risultato.indirizzo;
     this.risultatiIndirizzo = [];
@@ -166,6 +205,7 @@ export class CreateReportComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
+  /** Salva i file scelti dall'input; l'upload vero avviene solo dopo il salvataggio della segnalazione. */
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files) {
@@ -173,6 +213,12 @@ export class CreateReportComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  /**
+   * Valida i campi obbligatori (posizione inclusa: senza un click sulla
+   * mappa latitudine/longitudine restano null) e poi crea o aggiorna la
+   * segnalazione a seconda di inModifica. In entrambi i casi il passo
+   * successivo è lo stesso: caricare le foto e reindirizzare.
+   */
   invia(): void {
     this.errore = null;
 
@@ -214,6 +260,12 @@ export class CreateReportComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
+  /**
+   * Carica ogni foto selezionata in parallelo e aspetta che tutte finiscano
+   * — con successo o con errore, non importa quale — prima di andare al
+   * dettaglio della segnalazione: un errore su una singola foto non deve
+   * bloccare l'utente sulla pagina del form.
+   */
   private caricaFotoESpostati(reportId: number): void {
     if (this.fileSelezionati.length === 0) {
       this.router.navigate(['/reports', reportId]);

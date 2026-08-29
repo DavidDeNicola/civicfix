@@ -10,6 +10,12 @@ import { ETICHETTE_CATEGORIA, ETICHETTE_STATO } from '../../../core/pipes/etiche
 /** Centro di ripiego quando non c'è nulla da mostrare: Lecce, come altrove. */
 const CENTRO_PREDEFINITO: L.LatLngExpression = [40.3515, 18.1750];
 
+/**
+ * Mappa Leaflet riutilizzabile per mostrare un elenco di segnalazioni:
+ * riceve i dati dall'esterno via @Input (reports, centro, raggioKm) e si
+ * ridisegna da sola quando cambiano — è un componente "dumb" (presentazionale),
+ * senza stato proprio da gestire.
+ */
 @Component({
   selector: 'app-reports-map',
   standalone: true,
@@ -41,6 +47,12 @@ export class ReportsMapComponent implements OnChanges, OnDestroy {
 
   constructor(private router: Router) {}
 
+  /**
+   * Angular chiama questo hook a ogni cambio di un @Input. La mappa si crea
+   * una volta sola, alla prima chiamata (this.map ancora null); poi si
+   * ridisegna solo la parte davvero cambiata: segnaposti se cambia reports,
+   * area di ricerca se cambiano centro o raggioKm.
+   */
   ngOnChanges(changes: SimpleChanges): void {
     if (!this.map) {
       this.inizializzaMappa();
@@ -53,12 +65,18 @@ export class ReportsMapComponent implements OnChanges, OnDestroy {
     }
   }
 
+  /** Libera mappa e observer alla distruzione del componente, per non lasciare listener orfani. */
   ngOnDestroy(): void {
     this.resizeObserver?.disconnect();
     this.map?.remove();
     this.map = null;
   }
 
+  /**
+   * Crea la mappa Leaflet centrata sul punto di ripiego e la collega al
+   * ResizeObserver: senza, Leaflet calcolerebbe dimensioni sbagliate se il
+   * contenitore nasce nascosto o a zero pixel (es. dentro una tab non attiva).
+   */
   private inizializzaMappa(): void {
     this.map = L.map(this.contenitore.nativeElement).setView(CENTRO_PREDEFINITO, 13);
 
@@ -75,6 +93,11 @@ export class ReportsMapComponent implements OnChanges, OnDestroy {
     this.resizeObserver.observe(this.contenitore.nativeElement);
   }
 
+  /**
+   * Ricrea da zero tutti i segnaposti a ogni cambio di reports (più semplice
+   * e sicuro che calcolare un diff), e collega a ognuno l'apertura del
+   * dettaglio al click sul pulsante dentro il popup.
+   */
   private disegnaSegnaposti(): void {
     if (!this.map) return;
 
@@ -100,6 +123,7 @@ export class ReportsMapComponent implements OnChanges, OnDestroy {
     this.inquadra();
   }
 
+  /** Genera l'HTML del popup di un segnaposto, con i testi liberi (titolo, indirizzo) sanificati contro XSS. */
   private contenutoPopup(report: Report): string {
     const categoria = ETICHETTE_CATEGORIA[report.category] ?? report.category;
     const stato = ETICHETTE_STATO[report.status] ?? report.status;
@@ -119,6 +143,11 @@ export class ReportsMapComponent implements OnChanges, OnDestroy {
       </div>`;
   }
 
+  /**
+   * Ridisegna punto e cerchio della ricerca per vicinanza: li rimuove sempre
+   * prima di ricrearli, così spariscono da soli quando l'utente disattiva
+   * la ricerca (centro diventa null).
+   */
   private disegnaAreaRicerca(): void {
     if (!this.map) return;
 

@@ -14,6 +14,13 @@ import {
   VoteResponse
 } from '../models/report.model';
 
+
+/**
+ * Chiamate HTTP verso l'API delle segnalazioni: CRUD, ricerca filtrata,
+ * voti, foto, cronologia. Nessuna logica qui — solo inoltro al backend,
+ * che resta l'unica fonte di verità su cosa è permesso fare.
+ */
+
 const API_URL = 'http://localhost:8080/api/reports';
 
 @Injectable({
@@ -124,6 +131,7 @@ export class ReportService {
     return this.http.post<Report>(API_URL, dto);
   }
 
+  /** FormData invece di JSON: necessario per inviare un file binario in multipart. */
   uploadPhoto(reportId: number, file: File): Observable<ReportPhoto> {
     const formData = new FormData();
     formData.append('file', file);

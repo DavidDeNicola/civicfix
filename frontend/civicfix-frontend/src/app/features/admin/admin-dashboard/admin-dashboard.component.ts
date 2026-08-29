@@ -44,6 +44,14 @@ const GRIGLIA_STAMPA = '#e2e8f0';
   templateUrl: './admin-dashboard.component.html',
   styleUrl: './admin-dashboard.component.scss'
 })
+
+/**
+ * Pannello di amministrazione: tre viste in una — gestione utenti/team,
+ * assegnazione delle segnalazioni aperte, statistiche con grafici
+ * (Chart.js) esportabili in CSV e PDF. È un componente grande perché
+ * raccoglie funzionalità diverse sotto le stesse tab, non perché una
+ * singola funzionalità sia complessa.
+ */
 export class AdminDashboardComponent implements OnInit, OnDestroy {
   users: AdminUser[] = [];
   teams: Team[] = [];
@@ -208,7 +216,8 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   }
 
   // --- Raggruppamenti ---------------------------------------------------
-
+  // Solo getter e filtri derivati dai dati già in memoria: nessuna chiamata
+  // HTTP in questo blocco.
   utentiPerRuolo(ruolo: Role): AdminUser[] {
     return this.users.filter(u => u.role === ruolo);
   }
@@ -268,7 +277,8 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   }
 
   // --- Creazione utenti e team ------------------------------------------
-
+  // Apertura dialog + chiamata al service; la lista si aggiorna in locale
+  // (spread dell'array) invece di ricaricare tutto da capo dopo la creazione.
   apriDialogUtente(): void {
     const ref = this.dialog.open(UserDialogComponent, {
       data: { teams: this.teams },
@@ -335,6 +345,10 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   }
 
   // --- Assegnazione segnalazioni ----------------------------------------
+  // Le tre tendine (team, operatore, priorità) si salvano solo per ciò che è
+  // davvero cambiato, con chiamate HTTP separate in sequenza vincolata: il
+  // team va assegnato prima dell'operatore, perché il backend rifiuta un
+  // operatore che non appartiene ancora al team assegnato.
 
   /**
    * true quando una delle tre tendine differisce dall'assegnazione in vigore.
@@ -409,7 +423,9 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   }
 
   // --- Statistiche --------------------------------------------------------
-
+  // Un metodo disegnaGrafico... per ciascuno dei cinque grafici, tutti sullo
+  // stesso schema: dati da "statistiche", colori letti dalle variabili CSS
+  // del tema attivo — così seguono chiaro/scuro senza logica dedicata.
   conteggioStato(stato: ReportStatus): number {
     return this.statistiche?.byStatus[stato] ?? 0;
   }

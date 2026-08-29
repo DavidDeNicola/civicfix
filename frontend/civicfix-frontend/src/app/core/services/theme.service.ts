@@ -2,6 +2,13 @@ import { Injectable, Renderer2, RendererFactory2, Inject } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 import { Subject } from 'rxjs';
 
+/**
+ * Tema chiaro/scuro dell'app: applica la classe CSS al body e ricorda la
+ * scelta in localStorage. Espone anche un Observable (cambiamentoTema$) per
+ * chi deve ridisegnare contenuti che il CSS da solo non aggiorna, come i
+ * grafici su canvas.
+ */
+
 const THEME_KEY = 'civicfix_theme';
 
 @Injectable({
