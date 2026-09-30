@@ -1,0 +1,45 @@
+name: civicfix
+
+services:
+  mysql-civicfix:
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: civicfix
+    volumes:
+      - mysql-civicfix-data:/var/lib/mysql
+    ports:
+      - "3307:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  civicfix-backend:
+    build: .
+    depends_on:
+      mysql-civicfix:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-civicfix:3306/civicfix
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: password
+      JWT_SECRET: kYE9GKjPZOM0NGCUR2m9IT47UZs7OPtnnhBM8aUAC9m
+      ADMIN_USERNAME: admin
+      ADMIN_EMAIL: admin@civicfix.local
+      ADMIN_PASSWORD: Password1!
+    ports:
+      - "8080:8080"
+
+  civicfix-frontend:
+    build:
+      context: "../frontend/civicfix-frontend"
+    depends_on:
+      - civicfix-backend
+    ports:
+      - "4200:80"
+
+
+volumes:
+  mysql-civicfix-data:
