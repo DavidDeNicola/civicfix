@@ -1,0 +1,40 @@
+name: civicfix
+
+services:
+  civicfix-backend:
+    build: .
+    restart: unless-stopped
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-condiviso:3306/civicfix?allowPublicKeyRetrieval=true&useSSL=false
+      SPRING_DATASOURCE_USERNAME: civicfix
+      SPRING_DATASOURCE_PASSWORD: ${CIVICFIX_DB_PASS}
+      JWT_SECRET: ${CIVICFIX_JWT_SECRET}
+      ADMIN_USERNAME: admin
+      ADMIN_EMAIL: admin@civicfix.local
+      ADMIN_PASSWORD: ${CIVICFIX_ADMIN_PASSWORD}
+      DDL_AUTO: update
+      SHOW_SQL: "false"
+      CORS_ALLOWED_ORIGINS: https://civicfix-app.duckdns.org
+      FRONTEND_URL: https://civicfix-app.duckdns.org
+      JAVA_TOOL_OPTIONS: "-Xmx256m -Xss512k -XX:+UseSerialGC"
+    volumes:
+      - civicfix-uploads:/app/uploads
+    networks:
+      - default
+      - rete-condivisa
+
+  civicfix-frontend:
+    build:
+      context: ../frontend/civicfix-frontend
+    restart: unless-stopped
+    depends_on:
+      - civicfix-backend
+    ports:
+      - "127.0.0.1:8083:80"
+
+networks:
+  rete-condivisa:
+    external: true
+
+volumes:
+  civicfix-uploads:
