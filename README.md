@@ -1,5 +1,9 @@
 # CivicFix
 
+[![CI](https://github.com/DavidDeNicola/civicfix/actions/workflows/ci.yml/badge.svg)](https://github.com/DavidDeNicola/civicfix/actions/workflows/ci.yml)
+
+
+
 ![Java](https://img.shields.io/badge/Java-25-028090?style=flat-square)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.1-6DB33F?style=flat-square&logo=springboot&logoColor=white)
 ![Angular](https://img.shields.io/badge/Angular-DD0031?style=flat-square&logo=angular&logoColor=white)
@@ -8,6 +12,17 @@
 
 **CivicFix** è una piattaforma di segnalazione civica: i cittadini segnalano problemi urbani — buche, illuminazione guasta, rifiuti abbandonati — geolocalizzandoli su una mappa; gli operatori comunali, organizzati in team per categoria, li prendono in carico e ne aggiornano lo stato fino alla risoluzione; un amministratore gestisce utenti, team e monitora l'andamento con statistiche in tempo reale.
 
+## Demo online
+
+L'applicazione è disponibile su **https://civicfix-app.duckdns.org**
+
+| Ruolo          | Username     | Password                  |
+|----------------|--------------|---------------------------|
+| Amministratore | `admin`      | `53e03cc63c34dc5f2a204d7c`    |
+| Cittadino      | `citizen1`   | `password123`             |
+| Operatore      | `operatore1` | `password123`             |
+
+I dati sono di prova e vengono generati all'avvio. Il deploy avviene in automatico a ogni push su `main` tramite GitHub Actions (test, build e pubblicazione su AWS EC2).
 
 
 ## 📸 Screenshot
