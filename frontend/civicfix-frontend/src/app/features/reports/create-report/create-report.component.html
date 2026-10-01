@@ -66,8 +66,9 @@
     }
 
     <div class="file-input">
-      <label for="photos">Foto (facoltative)</label>
+      <label for="photos">Foto (facoltative, max 5 MB)</label>
       <input id="photos" type="file" multiple accept="image/*" (change)="onFileSelected($event)">
+      @if (erroreFoto) { <p class="error-message">{{ erroreFoto }}</p> }
     </div>
 
     <button mat-raised-button color="primary" [disabled]="salvataggioInCorso" (click)="invia()">

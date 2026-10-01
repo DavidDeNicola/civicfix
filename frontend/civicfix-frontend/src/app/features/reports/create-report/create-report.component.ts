@@ -205,13 +205,29 @@ export class CreateReportComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  /** Salva i file scelti dall'input; l'upload vero avviene solo dopo il salvataggio della segnalazione. */
-  onFileSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    if (input.files) {
-      this.fileSelezionati = Array.from(input.files);
-    }
+/** Dimensione massima accettata dal backend (spring.servlet.multipart.max-file-size). */
+private static readonly MAX_DIMENSIONE_FOTO = 5 * 1024 * 1024;
+
+erroreFoto: string | null = null;
+
+/** Salva i file scelti dall'input; l'upload vero avviene solo dopo il salvataggio della segnalazione. */
+onFileSelected(event: Event): void {
+  const input = event.target as HTMLInputElement;
+  this.erroreFoto = null;
+  if (!input.files) return;
+
+  const troppoGrandi = Array.from(input.files)
+    .filter(f => f.size > CreateReportComponent.MAX_DIMENSIONE_FOTO);
+
+  if (troppoGrandi.length > 0) {
+    this.erroreFoto = `Foto troppo grande (${troppoGrandi.map(f => f.name).join(', ')}): il limite è 5 MB.`;
+    this.fileSelezionati = [];
+    input.value = '';
+    return;
   }
+
+  this.fileSelezionati = Array.from(input.files);
+}
 
   /**
    * Valida i campi obbligatori (posizione inclusa: senza un click sulla
