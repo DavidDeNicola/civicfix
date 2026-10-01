@@ -3,9 +3,10 @@ import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
 import { AuthService } from '../services/auth.service';
+import { environment } from '../../../environments/environment';
 
 /** Solo le richieste dirette al nostro backend devono portare il token. */
-const NOSTRA_API = 'http://localhost:8080/api';
+const NOSTRA_API = `${environment.apiUrl}/api`;
 
 export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);

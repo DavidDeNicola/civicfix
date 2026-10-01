@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { jwtDecode } from 'jwt-decode';
 import { AuthResponse, Role } from '../models/user.model';
+import { environment } from '../../../environments/environment';
 
 /**
  * Stato di autenticazione lato client: token in localStorage, username e
@@ -19,7 +20,7 @@ interface TokenPayload {
   role: Role;
 }
 
-const API_URL = 'http://localhost:8080/api/auth';
+const API_URL = `${environment.apiUrl}/api/auth`;
 const TOKEN_KEY = 'civicfix_token';
 
 @Injectable({

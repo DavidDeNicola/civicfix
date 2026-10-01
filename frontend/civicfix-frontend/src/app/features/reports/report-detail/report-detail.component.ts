@@ -20,8 +20,9 @@ import { CategoriaPipe, PrioritaPipe, StatoPipe } from '../../../core/pipes/etic
 import { ConfermaDialogComponent } from '../../../shared/components/conferma-dialog/conferma-dialog.component';
 import { Component, ElementRef, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import * as L from 'leaflet';
+import { environment } from '../../../../environments/environment';
 
-const PHOTO_BASE_URL = 'http://localhost:8080';
+const PHOTO_BASE_URL = environment.apiUrl;
 
 @Component({
   selector: 'app-report-detail',

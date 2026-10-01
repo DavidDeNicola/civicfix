@@ -13,6 +13,7 @@ import {
   AssignPriorityRequest,
   VoteResponse
 } from '../models/report.model';
+import { environment } from '../../../environments/environment';
 
 
 /**
@@ -21,7 +22,7 @@ import {
  * che resta l'unica fonte di verità su cosa è permesso fare.
  */
 
-const API_URL = 'http://localhost:8080/api/reports';
+const API_URL = `${environment.apiUrl}/api/reports`;
 
 @Injectable({
   providedIn: 'root'
