@@ -612,8 +612,13 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     const link = document.createElement('a');
     link.href = url;
     link.download = nomeFile;
+    // Safari iOS gestisce il clic solo se il link fa parte della pagina.
+    document.body.appendChild(link);
     link.click();
-    URL.revokeObjectURL(url);
+    link.remove();
+    // Safari iOS legge il file con un leggero ritardo dopo il clic: revocando
+    // subito l'URL il file non esisteva più (errore WebKitBlobResource 1).
+    setTimeout(() => URL.revokeObjectURL(url), 60_000);
   }
 
   /** Un campo va tra virgolette solo se contiene il separatore, per non spezzare le colonne. */
@@ -711,7 +716,8 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
       this.aggiungiGraficoAlPdf(doc, this.graficoTeam, margine, y, larghezza * 2 + 6, altezza, 'Team più attivi');
     }
 
-    doc.save(`statistiche-civicfix-${this.dataFileEsportazione()}.pdf`);
+    // doc.save() su iOS non avvia il download: si passa dal metodo comune.
+    this.scaricaBlob(doc.output('blob'), `statistiche-civicfix-${this.dataFileEsportazione()}.pdf`);
   }
 
   private aggiungiGraficoAlPdf(
