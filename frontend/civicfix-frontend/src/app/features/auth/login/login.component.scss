@@ -2,7 +2,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: calc(100vh - var(--footer-height));
+  min-height: calc(100dvh - var(--footer-height));
   padding: var(--space-md);
   box-sizing: border-box;
   // niente background-color qui: lo eredita dal body

@@ -1,5 +1,5 @@
 .home-page {
-  min-height: calc(100vh - var(--footer-height));
+  min-height: calc(100dvh - var(--footer-height));
   display: flex;
   flex-direction: column;
 }
