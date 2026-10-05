@@ -281,3 +281,12 @@ mat-chip, .mat-mdc-chip {
 h1, h2, h3, .mat-mdc-card-title {
   font-family: 'Poppins', sans-serif !important;
 }
+
+// Le tab di Angular Material rendono la scheda attiva un'area scrollabile
+// a sé, annidata dentro .content-area che scorre già. Su Safari iOS i due
+// scroller annidati lasciavano non disegnato il contenuto arrivato dopo
+// il caricamento dei dati: qui la scheda torna a crescere normalmente.
+.admin-tabs .mat-mdc-tab-body.mat-mdc-tab-body-active,
+.admin-tabs .mat-mdc-tab-body-content {
+  overflow: visible;
+}
